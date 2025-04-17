@@ -12,8 +12,6 @@ typedef enum e_token_type
     REDICT_APPEND, // >>
     IS_HEREDOC, // <<
     IS_EOF,
-	IS_AND, // && 
-	IS_OR, // ||
     //( ???
     //) ???
 }token_type;

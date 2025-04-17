@@ -5,6 +5,7 @@
   3. token type是redirection的时候，把operator update，然后左边是之前那个node，右边是file类型，然后把左边的整体update到现在的这个node
   4. 当token类型什么也不是的时候，结束运行*/
 
+  /*？？？？token type rediction append + redirection heredoc 有待处理*/
 ASTnode	*ft_parse(t_token **token)
 {
 	ASTnode *left;
@@ -24,7 +25,7 @@ ASTnode	*ft_parse(t_token **token)
 			node->right = ft_parse(token);
 			left = node;
 		}
-		else if ((*token)->type == REDICT_OUT || (*token)->type == REDICT_IN)
+		else if ((*token)->type == REDICT_OUT || (*token)->type == REDICT_IN || (*token)->type == IS_HEREDOC || (*token)->type == REDICT_APPEND)
 		{
 			node = malloc(sizeof(ASTnode));
 			if (!node)

@@ -31,10 +31,11 @@ typedef struct s_shell
     char    **environ;
     //?? error de flux ;
     struct termios  termios_p;
-	t_node	*ast;
+	ASTnode	*ast;
 }t_shell;
 
 externe t_shell shell_program;
 
+typedef
 
 # endif

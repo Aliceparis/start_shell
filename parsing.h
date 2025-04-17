@@ -1,6 +1,8 @@
 #ifndef PARSING_H
 # define PARSING_H
 
+
+/*redict_type append + heredoc ???? */
 typedef enum e_node_type
 {
 	CMD,
@@ -12,6 +14,8 @@ typedef enum	e_redict_type
 {
 	IN,
 	OUT,
+	APPEND,
+	HEREDOC,
 }redict_type;
 
 typedef struct e_node

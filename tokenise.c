@@ -150,3 +150,4 @@ void update_token_value(token_type type, char *value, t_token **token_list)
         tmp->next = new;
     }
 }
+/*！！！！！！需要对quote进行一个检测，如果quote没有关闭，那么就需要显示error*/
