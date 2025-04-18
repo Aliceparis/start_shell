@@ -17,4 +17,4 @@ Ajout dossier de pipex
 2. token中的单双引号是否保留
 3. expansion里面 $？的输出值没有添加在内，在change variable中需要添加进去
 4. expansion 中，expand-command 和ft_expand_ast没有进行检测，expand部分没有问题
-5. 
+5. expansion 中，如果$ 后面是空格，应当显示$ ，但是存在了free的问题
