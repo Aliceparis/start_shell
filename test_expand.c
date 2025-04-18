@@ -107,6 +107,8 @@ char	*change_variable(char *str, int *i)
 	if (str[var_start] == '?')
 	////fonction pour retourner la valeur de la derniere execution
 		return (NULL);
+	if (str[var_start] == ' ')
+		return ("$");
 	while (ft_isalnum(str[var_start + var_len]) || str[var_start + var_len] == '_')
 		var_len++;
 	var_name = ft_substr(str, var_start, var_len);
@@ -181,7 +183,6 @@ char	*expande_word(char *str)
 			tmp = content_in_single_quote(str, &i);
 		else if (str[i] == '"')
 			tmp = content_in_double_quote(str, &i);
-			
 		else if (str[i] == '$')
 			tmp = change_variable(str, &i);
 		else
@@ -192,23 +193,24 @@ char	*expande_word(char *str)
 			tmp = ft_substr(str, j, i - j);
 		}
 		resultat = ft_strjoin(resultat, tmp);
-		free(tmp);
+		if (tmp)
+			free(tmp);
 	}
 	return (resultat);
 }
 int	main(void)
 {
-	char	*test1 = "echo \'\"$USER\"\'";
+	/*char	*test1 = "echo \'\"$USER\"\'";
 	char	*test2 = "echo \"\'$HOME\'\"";
-	char	*test3 = "\"$cat ls -l\"";
-	char	*test4 = "Simple $USER test with \"$USER\" and '$SHELL'";
+	char	*test3 = "\"$cat ls -l\"";*/
+	char	*test4 = "Simple $USER$USER$USER$ USER test with \"$USER\" and '$SHELL'\"\"\"";
 	
-	char	*resultat1 = expande_word(test1);
+	/*char	*resultat1 = expande_word(test1);
 	printf("single quote first : %s\n", resultat1);
 	char	*resultat2 = expande_word(test2);
 	printf("double quote first: %s\n", resultat2);
 	char	*resultat3 = expande_word(test3);
-	printf("only $ :%s\n", resultat3);
+	printf("only $ :%s\n", resultat3);*/
 	char	*resultat4 = expande_word(test4);
 	printf("only test : %s\n", resultat4);
 }
