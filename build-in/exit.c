@@ -18,14 +18,26 @@
 
 int ft_exit(t_shell *shell,char **args)
 {
+    int i;
+
+    i = 0;
     if (args[1] && args[2])
     {
         shell->ret = 1;
         error("exit: too many arguments\n");
         return ;
     }
-    else if (args[1] && ft_atoi(args[1]) == 0)
+    else if (args[1])
     {
+        while (args[1][i])
+        {
+            if(!ft_isdigit(args[1][i]))
+            {
+                error("ce n'est pas un nombre");
+                exit(255);
+            }
+            i++;
+        }
         shell->ret = 255;
         exit(shell->ret);
     }
