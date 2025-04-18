@@ -11,6 +11,8 @@ Ajout dossier de pipex
 - export
 - exit
 
+**Dispatch_cmd**
+将我们的cmd 分成 builtin/简单cmd 和 pipe 然后execute
 
 ***************待解决的问题***********
 1. token中，需要对quote是否闭合进行检测，如果没有闭合，error
