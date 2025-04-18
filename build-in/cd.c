@@ -30,19 +30,19 @@ int ft_cd(char **args)
         {
             if (chdir(home) != 0)
             {
-                print_error("minishell: cd");
+                error("minishell: cd");
                 return (1);
             }
         }
         else
         {
-            fprintf(stderr, "minishell: cd: HOME not set\n");
+            error("minishell: cd: HOME not set\n");
             return (1);
         }
     }
     else if (chdir(args[1]) != 0)
     {
-        print_error("cd erreur");
+        error("cd erreur");
         return (1);
     }
     return (0);
