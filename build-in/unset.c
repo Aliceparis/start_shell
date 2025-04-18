@@ -16,7 +16,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-t_env *unset(t_env *env, const char *key)
+t_env *ft_unset(t_env *env, const char *key)
 {
     t_env *current = env;
     t_env *prev = NULL;
