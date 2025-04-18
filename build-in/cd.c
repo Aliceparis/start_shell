@@ -30,13 +30,13 @@ int ft_cd(char **args)
         {
             if (chdir(home) != 0)
             {
-                error("minishell: cd");
+                error("erreur de cd home");
                 return (1);
             }
         }
         else
         {
-            error("minishell: cd: HOME not set\n");
+            error("cd:erreur on ne trouve pas HOME\n");
             return (1);
         }
     }
