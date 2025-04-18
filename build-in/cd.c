@@ -14,27 +14,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void error(const char *msg)
+void print_error(const char *msg)
 {
     perror(msg);
-    exit(1);
 }
 
 int ft_cd(char **args)
 {
+    char *home;
+    
     if (!args[1])
     {
-        if (getenv("HOME"))
-            chdir(getenv("HOME"));
+        home = getenv("HOME");
+        if (home)
+        {
+            if (chdir(home) != 0)
+            {
+                print_error("minishell: cd");
+                return (1);
+            }
+        }
         else
         {
-            error("minishell: cd: HOME not set\n");
+            fprintf(stderr, "minishell: cd: HOME not set\n");
             return (1);
         }
     }
     else if (chdir(args[1]) != 0)
     {
-        error("erreur du cd");
+        print_error("cd erreur");
         return (1);
     }
     return (0);
