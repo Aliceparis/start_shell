@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-t_env *export(t_env *env, const char *key, const char *value)
+t_env *ft_export(t_env *env, const char *key, const char *value)
 {
     t_env *current;
     t_env *new_node;
