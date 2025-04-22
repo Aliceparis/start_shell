@@ -93,31 +93,41 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	new[i] = '\0';
 	return (new);
 }
-char	*change_variable(char *str, int *i)
+char	*joint_and_free(char *s1, char *s2)
 {
-	int	var_start;
-	char	*var_name;
-	char	*tmp;
-	char	*value;
-	int	var_len = 0;
+	char	*resultat;
 
-	(*i)++;
-	var_start = *i;
-	value = ft_strdup("");
-	if (str[var_start] == '?')
-	////fonction pour retourner la valeur de la derniere execution
-		return (NULL);
-	if (str[var_start] == ' ')
-		return ("$");
-	while (ft_isalnum(str[var_start + var_len]) || str[var_start + var_len] == '_')
+	resultat = ft_strjoin(s1, s2);
+	free(s1);
+	return (resultat);
+}
+char	*content_with_variable(char *str, int *i)
+{
+	int	start;
+	char	*resultat;
+	char	*var_name;
+	int		var_len;
+	char	*tmp;
+
+	start = *i + 1;
+	resultat = ft_strdup("");
+	var_len = 0;
+	if (str[*i] == '?')
+		return (NULL); //// fonction pour retourner la valeur de la derniere execution 
+	if (str[*i] == ' ')
+	{
+		tmp = ft_substr(str, *i, 1);
 		var_len++;
-	var_name = ft_substr(str, var_start, var_len);
+	}
+	while (ft_isalnum(str[start + var_len]) || str[start + var_len] == '_')
+		var_len++;
+	var_name = ft_substr(str, start, var_len);
 	tmp = getenv(var_name);
+	free(var_name);
 	if (tmp)
-		value = ft_strjoin(value, tmp);
-	//free(tmp);
-	*i = var_start + var_len;
-	return (value);
+		resultat = joint_and_free(resultat, tmp);
+	*i = start + var_len;
+	return (resultat);
 }
 
 char	*content_in_single_quote(char *str, int *i)
@@ -138,41 +148,45 @@ char	*content_in_single_quote(char *str, int *i)
 char	*content_in_double_quote(char *str, int *i)
 {
 	char	*tmp;
-	const char	*content;
 	char	*resultat;
-	int	j;
 	int	start;
 
 	(*i)++; // double_quote所在地方
-	j = *i;
 	resultat = ft_strdup("");
-	while (str[j] && str[j] != '"')
+	while (str[*i] && str[*i] != '"')
 	{
-		if (str[j] == '$')
-			tmp = change_variable(str, &j);
+		if (str[*i] == '$')
+			tmp = content_with_variable(str, i);
 		else /*juste need to move_out the double quote liKe in single quote*/
 		{
-			start = j;
-			while (str[j] && str[j] != '"')
-				j++;
-			tmp = ft_substr(str, start, j - start);
-		}		
+			start = *i;
+			while (str[*i] && str[*i] != '"' && str[*i] != '$')
+				(*i)++;
+			tmp = ft_substr(str, start, *i - start);
+		}
+		resultat = joint_and_free(resultat, tmp);
+		free(tmp);	
 	}
-	resultat = ft_strjoin(resultat, tmp);
-	free(tmp);
-	if (str[j] == '"')
-		j++;
-	*i = j;
+	if (str[*i] == '"')
+		(*i)++;
 	return (resultat);
 }
 
-
-char	*expande_word(char *str)
+char	*content_simple(char *str, int *i)
+{
+	int	j;
+	char	*resultat;
+	j = *i;
+	while (str[*i] && str[*i] != '\'' && str[*i] != '"' && str[*i] != '$')
+		(*i)++;
+	resultat = ft_substr(str, j, *i -j);
+	return (resultat);
+}
+char	*expand_word(char *str)
 {
 	int	i;
 	char	*tmp;
 	char	*resultat;
-	const char	*content;
 	int	j;
 
 	i = 0;
@@ -184,20 +198,16 @@ char	*expande_word(char *str)
 		else if (str[i] == '"')
 			tmp = content_in_double_quote(str, &i);
 		else if (str[i] == '$')
-			tmp = change_variable(str, &i);
+			tmp = content_with_variable(str, &i);
 		else
-		{
-			j = i;
-			while (str[i] && str[i] !='\'' && str[i] != '"' && str[i] !='$')
-				i++;
-			tmp = ft_substr(str, j, i - j);
-		}
-		resultat = ft_strjoin(resultat, tmp);
+			tmp = content_simple(str, &i);
+		resultat = joint_and_free(resultat, tmp);
 		if (tmp)
 			free(tmp);
 	}
 	return (resultat);
 }
+
 int	main(void)
 {
 	/*char	*test1 = "echo \'\"$USER\"\'";
@@ -205,12 +215,13 @@ int	main(void)
 	char	*test3 = "\"$cat ls -l\"";*/
 	char	*test4 = "Simple $USER$USER$USER$ USER test with \"$USER\" and '$SHELL'\"\"\"";
 	
-	/*char	*resultat1 = expande_word(test1);
+	/*char	*resultat1 = expand_word(test1);
 	printf("single quote first : %s\n", resultat1);
-	char	*resultat2 = expande_word(test2);
+	char	*resultat2 = expand_word(test2);
 	printf("double quote first: %s\n", resultat2);
-	char	*resultat3 = expande_word(test3);
+	char	*resultat3 = expand_word(test3);
 	printf("only $ :%s\n", resultat3);*/
-	char	*resultat4 = expande_word(test4);
+	char	*resultat4 = expand_word(test4);
 	printf("only test : %s\n", resultat4);
+	free(resultat4);
 }

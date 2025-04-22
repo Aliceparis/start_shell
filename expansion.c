@@ -45,31 +45,31 @@ void	expande_commande(ASTnode *node)
 如果遇到了双引号，$后面的variable需要进行getenv来替换
 ？？？？？  $？ 的使用还需要添加在内*/
 
-char	*change_variable(char *str, int *i)
+char	*expand_word(char *str)
 {
-	int	var_start;
-	char	*var_name;
+	int	i;
 	char	*tmp;
-	char	*value;
-	int	var_len = 0;
+	char	*resultat;
+	int	j;
 
-	(*i)++;
-	var_start = *i;
-	value = ft_strdup("");
-	if (str[var_start] == '?')
-	////fonction pour retourner la valeur de la derniere execution
-		return (NULL);
-	while (ft_isalnum(str[var_start + var_len]) || str[var_start + var_len] == '_')
-		var_len++;
-	var_name = ft_substr(str, var_start, var_len);
-	tmp = getenv(var_name);
-	if (tmp)
-		value = ft_strjoin(value, tmp);
-	//free(tmp);
-	*i = var_start + var_len;
-	return (value);
+	i = 0;
+	resultat = ft_strdup("");
+	while (str[i])
+	{
+		if (str[i] == '\'')
+			tmp = content_in_single_quote(str, &i);
+		else if (str[i] == '"')
+			tmp = content_in_double_quote(str, &i);
+		else if (str[i] == '$')
+			tmp = content_with_variable(str, &i);
+		else
+			tmp = content_simple(str, &i);
+		resultat = joint_and_free(resultat, tmp);
+		if (tmp)
+			free(tmp);
+	}
+	return (resultat);
 }
-
 char	*content_in_single_quote(char *str, int *i)
 {
 	int	start;
@@ -88,62 +88,75 @@ char	*content_in_single_quote(char *str, int *i)
 char	*content_in_double_quote(char *str, int *i)
 {
 	char	*tmp;
-	const char	*content;
 	char	*resultat;
-	int	j;
 	int	start;
 
 	(*i)++; // double_quote所在地方
-	j = *i;
 	resultat = ft_strdup("");
-	while (str[j] && str[j] != '"')
+	while (str[*i] && str[*i] != '"')
 	{
-		if (str[j] == '$')
-			tmp = change_variable(str, &j);
+		if (str[*i] == '$')
+			tmp = content_with_variable(str, i);
 		else /*juste need to move_out the double quote liKe in single quote*/
 		{
-			start = j;
-			while (str[j] && str[j] != '"')
-				j++;
-			tmp = ft_substr(str, start, j - start);
-		}		
+			start = *i;
+			while (str[*i] && str[*i] != '"' && str[*i] != '$')
+				(*i)++;
+			tmp = ft_substr(str, start, *i - start);
+		}
+		resultat = joint_and_free(resultat, tmp);
+		free(tmp);	
 	}
-	resultat = ft_strjoin(resultat, tmp);
-	free(tmp);
-	if (str[j] == '"')
-		j++;
-	*i = j;
+	if (str[*i] == '"')
+		(*i)++;
 	return (resultat);
 }
 
-
-char	*expande_word(char *str)
+char	*content_with_variable(char *str, int *i)
 {
-	int	i;
-	char	*tmp;
+	int	start;
 	char	*resultat;
-	const char	*content;
-	int	j;
+	char	*var_name;
+	int		var_len;
+	char	*tmp;
 
-	i = 0;
+	start = *i + 1;
 	resultat = ft_strdup("");
-	while (str[i])
+	var_len = 0;
+	if (str[*i] == '?')
+		return (NULL); //// fonction pour retourner la valeur de la derniere execution 
+	if (str[*i] == ' ')
 	{
-		if (str[i] == '\'')
-			tmp = content_in_single_quote(str, &i);
-		else if (str[i] == '"')
-			tmp = content_in_double_quote(str, &i);	
-		else if (str[i] == '$')
-			tmp = change_variable(str, &i);
-		else
-		{
-			j = i;
-			while (str[i] && str[i] !='\'' && str[i] != '"' && str[i] !='$')
-				i++;
-			tmp = ft_substr(str, j, i - j);
-		}
-		resultat = ft_strjoin(resultat, tmp);
-		free(tmp);
+		tmp = ft_substr(str, *i, 1);
+		var_len++;
 	}
+	while (ft_isalnum(str[start + var_len]) || str[start + var_len] == '_')
+		var_len++;
+	var_name = ft_substr(str, start, var_len);
+	tmp = getenv(var_name);
+	free(var_name);
+	if (tmp)
+		resultat = joint_and_free(resultat, tmp);
+	*i = start + var_len;
+	return (resultat);
+}
+
+char	*content_simple(char *str, int *i)
+{
+	int	j;
+	char	*resultat;
+	j = *i;
+	while (str[*i] && str[*i] != '\'' && str[*i] != '"' && str[*i] != '$')
+		(*i)++;
+	resultat = ft_substr(str, j, *i -j);
+	return (resultat);
+}
+
+char	*joint_and_free(char *s1, char *s2)
+{
+	char	*resultat;
+
+	resultat = ft_strjoin(s1, s2);
+	free(s1);
 	return (resultat);
 }
