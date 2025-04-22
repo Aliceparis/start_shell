@@ -1,29 +1,18 @@
-//# include "minishell.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+/*在token中，是否保留引号？？*/
+/*token 里面，单双引号是否关闭已经作了检查，但是如果没有关闭的情况下，要显示error还未添加*/
 
-/*ft_token:
-    1. skip espaces
-    2. check the double quote and get the value between the quote
-    3. check the token type, and get the token type seperator
-    4. get others information, is the word token type
-    5. update the type and the value ine the structure*/
-int ft_isspace(char c )
+size_t	ft_strlen(const char *s)
 {
-    if ((c >= 9 && c <= 13) || c == ' ')
-        return (1);
+	size_t	i;
 
-    return (0);
-}
-
-void    skip_space(char **input)
-{
-    while (**input && ft_isspace(**input))
-        (*input)++;
-}
-int	is_quote(char c)
-{
-	if (c == '"' || c == '\'')
-		return (1);
-	return (0);
+	i = 0;
+	while (s[i] != '\0')
+		i++;
+	return (i);
 }
 int	is_quote_close(char *str)
 {
@@ -45,9 +34,57 @@ int	is_quote_close(char *str)
 		return (1);
 	return (0);
 }
-/*在token中，是否保留引号？？*/
-/*echo "Je m'appelle $firstName, j'ai ${age} ans."
-# Output : Je m'appelle Alex, j'ai 30 ans.*/
+char	*ft_substr(char const *s, unsigned int start, size_t len)
+{
+	char			*new;
+	unsigned int	i;
+
+	if (start >= ft_strlen(s))
+		len = 0;
+	else if (len > ft_strlen(s + start))
+		len = ft_strlen(s + start);
+	new = (char *)malloc(sizeof(char) * (len + 1));
+	if (!new)
+		return (NULL);
+	i = 0;
+	while (start + i < ft_strlen(s) && i < len)
+	{
+		new[i] = s[start + i];
+		i++;
+	}
+	new[i] = '\0';
+	return (new);
+}
+int	ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+	size_t	i;
+
+	i = 0;
+	if (n == 0)
+		return (0);
+	while (s1[i] && i < n - 1 && s2[i] && (s1[i] == s2[i]))
+		i++;
+	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+}
+int ft_isspace(char c )
+{
+    if ((c >= 9 && c <= 13) || c == ' ')
+        return (1);
+
+    return (0);
+}
+
+void    skip_space(char **input)
+{
+    while (**input && ft_isspace(**input))
+        (*input)++;
+}
+int	is_quote(char c)
+{
+	if (c == '\'' || c == '"')
+		return (1);
+	return (0);
+}
 char    *get_token_between_quote(char **input)
 {
     char    *resultat;
@@ -107,7 +144,7 @@ char    *get_token_word(char **input)
     start = *input;
     len = 0;
     resultat = NULL;
-    while (**input && (!ft_isspace(**input)) && !is_token_operator(*input) && !is_quote(**input))
+    while (**input && (!ft_isspace(**input)) && !is_token_operator(*input) && **input != '"')
     {
         (*input)++;
         len++;
@@ -119,10 +156,10 @@ char    *get_token_word(char **input)
 void    ft_token(char   *line)
 {
     char    *value;
-    t_token  *token_list;
+    //t_token  *token_list;
 
     value = NULL;
-    token_list = NULL;
+    //token_list = NULL;
 	if (!is_quote_close(line))
 	{
 		/////fonction de quite et free, (error : error syntax)??????
@@ -131,48 +168,24 @@ void    ft_token(char   *line)
     }
     while (*line)
     {
-        skip_space(&line); 
-        if (is_quote(*line))
+        skip_space(&line);
+		if (is_quote(*line))
             value = get_token_between_quote(&line); 
         else if (is_token_operator(line))
             value = get_token_operator(&line);
         else
             value = get_token_word(&line);
-        update_token_value(get_type_of_token(value), value, &token_list);
+		if (value)
+		{
+			printf("[%s]\n", value);
+			free(value);
+		}
     }
 }
-token_type    *get_type_of_token(char *str)
-{
-    if (!ft_strncmp(str, ">>", 2))
-        return (REDICT_APPEND);
-    if (ft_strncmp(str, "<<", 2))
-        return (IS_HEREDOC);
-    if (*str == '|')
-        return (IS_PIPE);
-    if (*str == '>')
-        return (REDICT_OUT);
-    if (*str == '<')
-        return (REDICT_IN);
-    return (IS_WORD);
-}
-void update_token_value(token_type type, char *value, t_token **token_list)
-{
-    t_token *new;
-    t_token *tmp;
 
-    new = malloc(sizeof(t_token));
-    if (!new)
-        return (NULL);
-    new->type = type;
-    new->value = value;
-    new->next = NULL;
-    if (!*token_list)
-        token_list = new;
-    else
-    {
-        tmp = *token_list;
-        while (tmp->next)
-            tmp = tmp->next;
-        tmp->next = new;
-    }
+int	main(void)
+{
+	char	*input = " echo \"oqnioa > test.txt";
+
+	ft_token(input);
 }
