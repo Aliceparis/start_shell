@@ -6,11 +6,14 @@
 /*   By: loulou <loulou@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 13:58:52 by loulou            #+#    #+#             */
-/*   Updated: 2025/04/17 14:31:41 by loulou           ###   ########.fr       */
+/*   Updated: 2025/04/22 15:37:42 by loulou           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft/libft.h"
+#include "../minishell.h"
+
+#define PATH_MAX 1024
 
 void error(const char *msg, int n_exit)
 {
@@ -19,19 +22,19 @@ void error(const char *msg, int n_exit)
 }
 
 
-int ft_pwd(void)
+void ft_pwd(t_shell *shell)
 {
-    char cwd[1024];
+    char cwd[PATH_MAX];
 
-    if (getcwd(cwd,1024) != NULL)
+    if (getcwd(cwd, PATH_MAX) != NULL)
         printf("%s\n", cwd);
     else
         error("pwd non trouve", 1);
-    return (0);
+    shell->exit_status = 0;
 }
 
-int main(void)
+/*int main(void)
 {
     ft_pwd();
     return (0);
-}
+}*/

@@ -6,7 +6,7 @@
 /*   By: loulou <loulou@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 13:58:57 by loulou            #+#    #+#             */
-/*   Updated: 2025/04/18 15:27:39 by loulou           ###   ########.fr       */
+/*   Updated: 2025/04/22 15:44:28 by loulou           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-t_env *export(t_env *env, const char *key, const char *value)
+t_env *ft_export(t_env *env, const char *key, const char *value)
 {
     t_env *current;
     t_env *new_node;

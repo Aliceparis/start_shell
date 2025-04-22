@@ -6,13 +6,14 @@
 /*   By: loulou <loulou@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 13:59:06 by loulou            #+#    #+#             */
-/*   Updated: 2025/04/17 14:11:41 by loulou           ###   ########.fr       */
+/*   Updated: 2025/04/22 15:25:38 by loulou           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../libft/libft.h"
+#include "../minishell.h"
 
-int ft_echo(char **args)
+void ft_echo(t_shell *shell, char **args)
 {
     int i;
     int line;
@@ -22,7 +23,7 @@ int ft_echo(char **args)
     if (args[i] && ft_strcmp(args[1], "-n") == 0)
     {
         line = 0;
-        i++;        
+        i++;    
     }
     while (args[i])
     {
@@ -33,12 +34,12 @@ int ft_echo(char **args)
     }
     if (line)
         printf("\n");
-    return (0);
+    shell->exit_status = 0;
 }
 
-int main(int argc, char **argv)
+/*int main(int argc, char **argv)
 {
     (void)argc;
     ft_echo(argv);
     return (0);
-}
+}*/

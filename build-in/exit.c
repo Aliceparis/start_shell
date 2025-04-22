@@ -6,7 +6,7 @@
 /*   By: loulou <loulou@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 13:59:02 by loulou            #+#    #+#             */
-/*   Updated: 2025/04/18 15:52:25 by loulou           ###   ########.fr       */
+/*   Updated: 2025/04/22 15:30:28 by loulou           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int ft_exit(t_shell *shell,char **args)
     i = 0;
     if (args[1] && args[2])
     {
-        shell->ret = 1;
+        shell->exit_status = 1;
         error("exit: too many arguments\n");
         return ;
     }
@@ -38,12 +38,12 @@ int ft_exit(t_shell *shell,char **args)
             }
             i++;
         }
-        shell->ret = 255;
-        exit(shell->ret);
+        shell->exit_status = (unsigned char)(ft_atoi(args[1]));
+        exit(shell->exit_status);
     }
     else if(args[1])
-        shell->rest = ft_atoi(args[1]);
+        shell->exit_status = ft_atoi(args[1]);
     else
-        shell->ret = 0;
-    exit(shell->ret);
+        shell->exit_status = 0;
+    exit(0);
 }
