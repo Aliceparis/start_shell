@@ -6,7 +6,7 @@
 /*   By: loulou <loulou@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 16:51:19 by loulou            #+#    #+#             */
-/*   Updated: 2025/04/18 18:07:20 by loulou           ###   ########.fr       */
+/*   Updated: 2025/04/22 16:00:31 by loulou           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 /*PIPEX FONCTION FILE: utils.c*/
 void	free_array(char **arr)
 {
-	int	i;
+	size_t	i;
 
 	i = 0;
 	if (!arr)
@@ -84,19 +84,41 @@ void	execute(char *argv, char **envp)
 	}
 	if (execve(path, cmd, envp) == -1)
 		error("Execution failed", 126);
+    free_array(cmd);
 }
 
 /*simple cmd ou un builtin*/
 int dispatch_simple_command(t_shell *shell, t_node *ast)
 {
+    pid_t pid;
+    int status;
+
     if (!ast || ast->type != CMD)
         return (1);
     if (is_builtin(ast->args[0]))
         return (excute_builtin(shell, ast->args));
-    else
+    pid = fork();
+    if (pid == 0)
+    {
         execute(ast->args[0], shell->environ);
+        exit(0);
+    }
+    else if (pid > 0)
+    {
+        waitpid(pid, &status, 0);
+        if (WIFEXITED(status))
+            shell->exit_status = WEXITSTATUS(status);
+        else
+            shell->exit_status = 1;
+    }
+    else
+    {
+        error("fork error", 1);
+        shell->exit_status = 1;
+    }
     return (0);
 }
+
 
 /*pipe*/
 int dispatch_pipeline(t_shell *shell, t_node *ast)
@@ -107,20 +129,19 @@ int dispatch_pipeline(t_shell *shell, t_node *ast)
         return (1);
     if (pipe(fd) == -1)
         error("pipe error", 1);
-
     if (fork() == 0)
     {
         dup2(fd[1], STDOUT_FILENO);
         close(fd[0]);
         dispatch_command(shell, ast->left);// 递归调度左子树
-        exit(0);
+        exit(shell->exit_status);
     }
     if (fork() == 0)
     {
         dup2(fd[0], STDIN_FILENO);
         close(fd[1]);
         dispatch_command(shell, ast->right);// 递归调度右子树
-        exit(0);
+        exit(shell->exit_status);
     }
     close(fd[0]);
     close(fd[1]);
@@ -128,7 +149,6 @@ int dispatch_pipeline(t_shell *shell, t_node *ast)
         ;
     return (0);
 }
-
 
 
 /* séparer simple cmd:builtin et les restes exemple pipe*/
