@@ -32,6 +32,7 @@ typedef struct s_shell
     //?? error de flux ;
     struct termios  termios_p;
 	ASTnode	*ast;
+    int exit_status;//退出值
 }t_shell;
 
 externe t_shell shell_program;
