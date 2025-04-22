@@ -6,10 +6,11 @@
 /*   By: loulou <loulou@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 13:58:19 by loulou            #+#    #+#             */
-/*   Updated: 2025/04/18 15:17:10 by loulou           ###   ########.fr       */
+/*   Updated: 2025/04/22 15:22:23 by loulou           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../minishell.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,7 +20,7 @@ void print_error(const char *msg)
     perror(msg);
 }
 
-int ft_cd(char **args)
+int ft_cd(t_shell *shell, char **args)
 {
     char *home;
     
@@ -30,21 +31,24 @@ int ft_cd(char **args)
         {
             if (chdir(home) != 0)
             {
-                error("erreur de cd home");
-                return (1);
+                print_error("minishell: cd");
+                shell->exit_status = 1;
+                return ;
             }
         }
         else
         {
-            error("cd:erreur on ne trouve pas HOME\n");
-            return (1);
+            print_error("minishell: cd: HOME not set\n");
+            shell->exit_status = 1;
+            return ;
         }
     }
     else if (chdir(args[1]) != 0)
     {
-        error("cd erreur");
-        return (1);
+        print_error("cd erreur");
+        shell->exit_status = 1;
+        return ;
     }
-    return (0);
+    shell->exit_status = 0;
 }
 
