@@ -1,0 +1,92 @@
+#ifndef MINISHELL_H
+# define MINISHELL_H
+
+# include "libft.h"
+# include "tokenising.h"
+# include "pipex.h"
+
+# include <unistd.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <termios.h>
+
+# include <readline/history.h>
+# include <readline/readline.h>
+
+typedef struct e_node ASTnode;
+
+typedef struct s_env
+{
+    char    *key;
+    char    *value;
+    struct s_env    *next;
+}t_env;
+
+typedef struct s_shell
+{
+    char    *line;
+    t_token *token_list;
+	t_token	*current_token;
+    t_env   *envlist;
+    int stdin;
+    int stdout;
+    char    **environ;
+    //?? error de flux ;
+    struct termios  termios_p;
+	ASTnode	*ast;
+    int exit_status;//退出值
+}t_shell;
+
+extern t_shell shell_program;
+
+/*******************main.c********************/
+void    init_shell(char **env);
+
+/******************init_env.c*******************/
+void    init_envlist(void);
+char    *get_key_env(char *str);
+char    *get_value_env(char *str);
+void    update_envlist(char *key, char *value);
+
+/******************env_util.c*******************/
+t_env    envlist_new(char *key, char *value);
+void   ft_envlist_addback(t_env *list);
+
+/******************execute_buildin.c*******************/
+void excute_builtin(t_shell *shell_program, char **args);
+int is_builtin(char *cmd);
+
+/******************dispatch_commande.c*******************/
+void	free_array(char **arr);
+char	*find_path(char *cmd, char **envp);
+void	error_commande(char *msg, int status);
+void	execute(char *argv, char **envp);
+int dispatch_simple_command(t_shell *shell_program, ASTnode *ast);
+int dispatch_pipeline(t_shell *shell_program, ASTnode *ast);
+int dispatch_command(t_shell *shell_program, ASTnode *ast);
+
+/******************cd.c*******************/
+void print_error(const char *msg);
+void ft_cd(t_shell *shell_program, char **args);
+
+/*****************echo.c***************************/
+void ft_echo(t_shell *shell_program, char **args);
+
+/*********************env.c************************/
+void ft_env(t_shell *shell_program, t_env *env);
+
+/********************exit.c*************************/
+int ft_exit(t_shell *shell_progran,char **args);
+
+/************************export.c************************/
+t_env *ft_export(t_env *env, const char *key, const char *value);
+
+/*********************pwd.c**********************************/
+void error(const char *msg, int n_exit);
+void ft_pwd(t_shell *shell_program);
+
+/************************unset.c******************************/
+t_env *ft_unset(t_env *env, const char *key);
+
+
+# endif
