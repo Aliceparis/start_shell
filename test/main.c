@@ -1,4 +1,7 @@
 #include "minishell.h"
+t_shell shell_program;
+
+static struct termios oldt;
 
 void    init_shell(char **env)
 {
@@ -6,8 +9,13 @@ void    init_shell(char **env)
     shell_program.environ = env;
     init_envlist();
     shell_program.stdin = dup(0);
-    shell_program.stdout = dup2(1);
-    tcgettattr(STDIN_FILENO, &shell_program.termios_p);
+    shell_program.stdout = dup(1);
+    tcgetattr(STDIN_FILENO, &shell_program.oldt);
+}
+
+void reset_terminal(void)
+{
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // 恢复原始设置
 }
 
 int main(int ac, char **av, char **envp)
@@ -16,13 +24,19 @@ int main(int ac, char **av, char **envp)
     init_shell(envp);
     while (1)
     {
-        shell_program.line = readline(PROMPT);
-       if (shell_program.line)
-        	add_history(shell_program.line);
+        shell_program.line = readline("Minishell> ");
+        if (shell_program.line)
+        {	
+            add_history(shell_program.line);
+            ft_token(shell_program.line);
+		    shell_program.ast = ft_parse(&shell_program.token_list);
+            ft_expand_ast(shell_program.ast);
+            dispatch_command(&shell_program, shell_program.ast);
+        }
         else
-        /////fonctions de clear ???
-        ft_tokenise(shell_program.line);
-		shell_program.ast = ft_parse();
-
+            break ;
     }
+// 恢复终端设置
+    reset_terminal();
+    return 0;
 }

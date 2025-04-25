@@ -32,7 +32,7 @@ ASTnode	*ft_parse(t_token **token)
 		////fonction error and free (error: malloc echoue)
 			node->operator = (*token)->value;
 			*token = (*token)->next;
-			if (!(*token) && || (*token)->type != IS_WORD)
+			if (!(*token) && (*token)->type != IS_WORD)
 				////fonction error and free (error: expected filename or deliminiter)
 			node->file = ft_strdup((*token)->value);
 			*token = (*token)->next;

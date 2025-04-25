@@ -7,8 +7,8 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror -g3 -Ilibft -I$(HEADER) 
 
 
-SRC = cd.c  dispatch_commande.c echo.c env.c execute_buildin.c exit.c expansion.c export.c init_env.c main.c \
-	parse.c pwd.c tokenise.c unset.c pipex.c
+SRC = cd.c dispatch_commande.c echo.c env.c execute_buildin.c exit.c expansion.c export.c init_env.c main.c \
+	parse.c pwd.c tokenise.c unset.c 
 OBJ = $(SRC:.c=.o)
 
 all : $(LIBFT) $(NAME)
@@ -17,7 +17,7 @@ $(LIBFT) :
 	@make -C libft all > /dev/null && echo "✅ compile libft réussi"
 
 $(NAME) : $(OBJ)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBFT)
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBFT) -lreadline
 
 clean : 
 	rm -rf $(OBJ)

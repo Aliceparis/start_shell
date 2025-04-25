@@ -34,7 +34,7 @@ int is_token_operator(char *input);
 char    *get_token_operator(char **input);
 char    *get_token_word(char **input);
 void    ft_token(char   *line);
-token_type    *get_type_of_token(char *str);
+token_type    get_type_of_token(char *str);
 void update_token_value(token_type type, char *value, t_token **token_list);
 
 #endif

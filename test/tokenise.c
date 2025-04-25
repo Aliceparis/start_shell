@@ -127,7 +127,7 @@
         if (!is_quote_close(line))
         {
             /////fonction de quite et free, (error : error syntax)??????
-            fprintf(stderr, "Error: unmatched quote found in input.\n");
+            printf("Error: unmatched quote found in input.\n");
             exit(EXIT_FAILURE);
         }
         while (*line)
@@ -142,7 +142,7 @@
             update_token_value(get_type_of_token(value), value, &token_list);
         }
     }
-    token_type    *get_type_of_token(char *str)
+    token_type    get_type_of_token(char *str)
     {
         if (!ft_strncmp(str, ">>", 2))
             return (REDICT_APPEND);
@@ -164,12 +164,12 @@
     
         new = malloc(sizeof(t_token));
         if (!new)
-            return (NULL);
+            return ;
         new->type = type;
         new->value = value;
         new->next = NULL;
         if (!*token_list)
-            token_list = new;
+            *token_list = new;
         else
         {
             tmp = *token_list;

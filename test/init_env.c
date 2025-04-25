@@ -1,6 +1,5 @@
 #include "minishell.h"
 
-
 void    init_envlist(void)
 {
     char    **environ;

@@ -4,9 +4,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
-
-
 #include "pipex.h"
+
 /*PIPEX FONCTION FILE: utils.c*/
 void	free_array(char **arr)
 {
@@ -49,7 +48,7 @@ char	*find_path(char *cmd, char **envp)
 	return (free_array(paths), NULL);
 }
 
-void	error_commmande(char *msg, int status)
+void	error_commande(char *msg, int status)
 {
 	write(2, msg, ft_strlen(msg));
 	write(2, "\n", 1);
@@ -76,16 +75,15 @@ void	execute(char *argv, char **envp)
 }
 
 /*simple cmd ou un builtin*/
-int dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
+void dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
 {
     pid_t pid;
     int status;
 
     if (!ast || ast->type != CMD)
-        //shell_program->exit_status = 1;
-        return (1);
+        shell_program->exit_status = 1;
     if (is_builtin(ast->args[0]))
-        return (excute_builtin(shell_program, ast->args));
+        excute_builtin(shell_program, ast->args);
     pid = fork();
     if (pid == 0)
     {
@@ -105,19 +103,19 @@ int dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
         error_commande("fork error", 1);
         shell_program->exit_status = 1;
     }
-    //return (0);
+    shell_program->exit_status = 0;
 }
 
 
 /*pipe*/
-int dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
+void dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
 {
     int fd[2];
 
     if (!ast || ast->type != PIPE)
-        return (1);
+        shell_program->exit_status = 1;
     if (pipe(fd) == -1)
-        error("pipe error", 1);
+        error_commande("pipe error", 1);
     if (fork() == 0)
     {
         dup2(fd[1], STDOUT_FILENO);
@@ -136,18 +134,18 @@ int dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
     close(fd[1]);
     while (waitpid(-1, NULL, 0) > 0)
         ;
-    return (0);
+    shell_program->exit_status = 0;
 }
 
 
 /* séparer simple cmd:builtin et les restes exemple pipe*/
-int dispatch_command(t_shell *shell_program, ASTnode *ast)
+void dispatch_command(t_shell *shell_program, ASTnode *ast)
 {
     if (!ast)
-        return (0);
+        shell_program->exit_status = 0;
     if (ast->type == CMD)
-        return dispatch_simple_command(shell_program, ast);
+        dispatch_simple_command(shell_program, ast);
     else if (ast->type == PIPE)
-        return dispatch_pipeline(shell_program, ast);
-    return (0);
+        dispatch_pipeline(shell_program, ast);
+    shell_program->exit_status = 0;
 }

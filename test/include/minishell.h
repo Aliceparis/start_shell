@@ -27,13 +27,13 @@ typedef struct s_shell
 {
     char    *line;
     t_token *token_list;
-	t_token	*current_token;
+	//t_token	*current_token;
     t_env   *envlist;
     int stdin;
     int stdout;
     char    **environ;
     //?? error de flux ;
-    struct termios  termios_p;
+    struct termios  oldt;
 	ASTnode	*ast;
     int exit_status;//退出值
 }t_shell;
@@ -62,13 +62,12 @@ void	free_array(char **arr);
 char	*find_path(char *cmd, char **envp);
 void	error_commande(char *msg, int status);
 void	execute(char *argv, char **envp);
-int dispatch_simple_command(t_shell *shell_program, ASTnode *ast);
-int dispatch_pipeline(t_shell *shell_program, ASTnode *ast);
-int dispatch_command(t_shell *shell_program, ASTnode *ast);
+void dispatch_simple_command(t_shell *shell_program, ASTnode *ast);
+void dispatch_pipeline(t_shell *shell_program, ASTnode *ast);
+void dispatch_command(t_shell *shell_program, ASTnode *ast);
 
 /******************cd.c*******************/
-void print_error(const char *msg);
-int ft_cd(t_shell *shell_program, char **args);
+void ft_cd(t_shell *shell_program, char **args);
 
 /*****************echo.c***************************/
 void ft_echo(t_shell *shell_program, char **args);
@@ -84,11 +83,12 @@ int ft_exit(t_shell *shell_progran,char **args);
 t_env *ft_export(t_env *env, const char *key, const char *value);
 
 /*********************pwd.c**********************************/
-void error(const char *msg, int n_exit);
 void ft_pwd(t_shell *shell_program);
 
 /************************unset.c******************************/
 t_env *ft_unset(t_env *env, const char *key);
+
+void reset_terminal(void);
 
 
 # endif
