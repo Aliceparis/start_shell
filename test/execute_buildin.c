@@ -18,7 +18,7 @@ void excute_builtin(t_shell *shell_program, char **args)
     else if (ft_strcmp(args[0], "env") == 0)
         ft_env(shell_program, shell_program->envlist);
     else if (ft_strcmp(args[0], "unset") == 0)
-        shell_program->envlist = ft_unset(shell_program->envlist, args);
+        shell_program->envlist = ft_unset(shell_program->envlist, *args);
     else if (ft_strcmp(args[0], "export") == 0)
     {
         if (args[1])
@@ -34,7 +34,7 @@ void excute_builtin(t_shell *shell_program, char **args)
                     *equal_sign = '=';
                 }
                 else
-                    error("minishell: export: invalid format: '%s' (expected VAR=VALUE)\n", args[i]);
+                    error("minishell: export: invalid format", 1);
                 i++;
             }
         }

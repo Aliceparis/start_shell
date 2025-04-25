@@ -4,17 +4,17 @@ LIBFT =libft/libft.a
 HEADER = ./include
 
 CC = cc 
-CFLAGS = -Wall -Wextra -Werror -g3 -Ilibft -I$(HEADER) -lreadline
+CFLAGS = -Wall -Wextra -Werror -g3 -Ilibft -I$(HEADER) 
 
 
-SRC = cd.c dispatch_commande.c echo.c env_util.c env.c execute_buildin.c exit.c expansion.c export.c init_env.c main.c \
+SRC = cd.c  dispatch_commande.c echo.c env.c execute_buildin.c exit.c expansion.c export.c init_env.c main.c \
 	parse.c pwd.c tokenise.c unset.c pipex.c
 OBJ = $(SRC:.c=.o)
 
 all : $(LIBFT) $(NAME)
 
 $(LIBFT) : 
-	make -C libft all 
+	@make -C libft all > /dev/null && echo "✅ compile libft réussi"
 
 $(NAME) : $(OBJ)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBFT)

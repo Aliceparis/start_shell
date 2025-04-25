@@ -3,6 +3,7 @@
 
 # include "libft.h"
 # include "tokenising.h"
+# include "parsing.h"
 # include "pipex.h"
 
 # include <unistd.h>
@@ -49,7 +50,7 @@ char    *get_value_env(char *str);
 void    update_envlist(char *key, char *value);
 
 /******************env_util.c*******************/
-t_env    envlist_new(char *key, char *value);
+t_env    *envlist_new(char *key, char *value);
 void   ft_envlist_addback(t_env *list);
 
 /******************execute_buildin.c*******************/
@@ -67,10 +68,11 @@ int dispatch_command(t_shell *shell_program, ASTnode *ast);
 
 /******************cd.c*******************/
 void print_error(const char *msg);
-void ft_cd(t_shell *shell_program, char **args);
+int ft_cd(t_shell *shell_program, char **args);
 
 /*****************echo.c***************************/
 void ft_echo(t_shell *shell_program, char **args);
+int ft_strcmp(const char *s1, const char *s2);
 
 /*********************env.c************************/
 void ft_env(t_shell *shell_program, t_env *env);

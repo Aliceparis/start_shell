@@ -1,5 +1,6 @@
 #include "minishell.h"
 
+
 void    init_envlist(void)
 {
     char    **environ;
@@ -15,7 +16,7 @@ void    init_envlist(void)
     {
         key = get_key_env(environ[i]);
         value = get_value_env(environ[i]);
-        updat_envlist(key, value);
+        update_envlist(key, value);
         i++;
     }
 }

@@ -3,7 +3,7 @@
 void    init_shell(char **env)
 {
     ft_memset(&shell_program, 0, sizeof(t_shell));
-    shell_prgram.environ = env;
+    shell_program.environ = env;
     init_envlist();
     shell_program.stdin = dup(0);
     shell_program.stdout = dup2(1);
@@ -16,7 +16,7 @@ int main(int ac, char **av, char **envp)
     init_shell(envp);
     while (1)
     {
-        shell_program.line = readline(Minishell);
+        shell_program.line = readline(PROMPT);
        if (shell_program.line)
         	add_history(shell_program.line);
         else

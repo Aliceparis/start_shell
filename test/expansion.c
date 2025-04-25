@@ -23,7 +23,7 @@ void	ft_expand_ast(ASTnode *node)
 		else if (node->type == REDIRECTION)
 			ft_expand_ast(node->left);
 		if (node->file)
-			expande_word(node->file);
+			expand_word(node->file);
 	}
 }
 void	expande_commande(ASTnode *node)
@@ -34,7 +34,7 @@ void	expande_commande(ASTnode *node)
 	i = 0;
 	while (node->args[i])
 	{
-		expanded = expande_word(node->args[i]);
+		expanded = expand_word(node->args[i]);
 		free(node->args[i]);
 		node->args[i] = expanded;
 		i++;
@@ -50,7 +50,6 @@ char	*expand_word(char *str)
 	int	i;
 	char	*tmp;
 	char	*resultat;
-	int	j;
 
 	i = 0;
 	resultat = ft_strdup("");

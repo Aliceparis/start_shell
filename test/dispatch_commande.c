@@ -82,6 +82,7 @@ int dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
     int status;
 
     if (!ast || ast->type != CMD)
+        //shell_program->exit_status = 1;
         return (1);
     if (is_builtin(ast->args[0]))
         return (excute_builtin(shell_program, ast->args));
@@ -104,7 +105,7 @@ int dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
         error_commande("fork error", 1);
         shell_program->exit_status = 1;
     }
-    return (0);
+    //return (0);
 }
 
 
