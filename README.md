@@ -21,4 +21,4 @@ Ajout dossier de pipex
 4. buildin当中，有多个的error fonction，有点不同，需要分开还是统一？pipex的compile目前有问题，test当中暂时全部混合
 
 
-ft_fpruntf OK
+**ft_fprintf OK**
