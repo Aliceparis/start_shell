@@ -60,10 +60,11 @@ int main(int ac, char **av, char **envp)
             add_history(shell_program.line);
             ft_token(shell_program.line, &(shell_program.token_list));
 		    shell_program.ast = ft_parse(&shell_program.token_list);
-			print_ast(shell_program.ast, 0);
-			printf("after expansion\n");
+			//print_ast(shell_program.ast, 0);
+			//printf("after expansion\n");
             ft_expand_ast(shell_program.ast);
-            print_ast(shell_program.ast, 0);
+			//printf("after expansion\n");
+            //print_ast(shell_program.ast, 0);
             dispatch_command(&shell_program, shell_program.ast);
         }
         else

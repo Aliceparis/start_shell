@@ -12,12 +12,13 @@ SRC = cd.c dispatch_commande.c echo.c env.c execute_buildin.c exit.c expansion.c
 OBJ = $(SRC:.c=.o)
 
 all : $(LIBFT) $(NAME)
-
+	
 $(LIBFT) : 
 	@make -C libft all > /dev/null && echo "✅ compile libft réussi"
 
 $(NAME) : $(OBJ)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBFT) -lreadline
+
+	@$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBFT) -lreadline 
 
 clean : 
 	rm -rf $(OBJ)

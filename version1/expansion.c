@@ -61,10 +61,10 @@ char	*expand_word(char *str)
 			tmp = content_with_variable(str, &i);
 		else
 			tmp = content_simple(str, &i);
-		/*printf("tmp expand_word :%s\n", tmp);
+		//printf("tmp expand_word :%s\n", tmp);
 		resultat = joint_and_free(resultat, tmp);
 		if (tmp)
-			free(tmp);*/
+			free(tmp);
 	}
 	return (resultat);
 }
