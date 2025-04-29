@@ -50,3 +50,13 @@ void free_envlist(t_env *env)
         free(tmp);
     }
 }
+
+void    exit_minishell(void)
+{
+    if (shell_program.stdin != -1)
+        close(shell_program.stdin);
+    if (shell_program.stdout != -1)
+        close(shell_program.stdout);
+    free_envlist(shell_program.envlist);
+    exit(shell_program.exit_status);
+}
