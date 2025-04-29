@@ -29,7 +29,7 @@ fclean : clean
 	rm -rf $(NAME)
 	make -C libft fclean 
 
-valgrind: $(NAME)
+valgrind: all
 	@valgrind $(VAL_FLAGS) ./$(NAME)
 
 re : fclean all 
