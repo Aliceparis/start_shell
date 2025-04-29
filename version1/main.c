@@ -49,6 +49,8 @@ void	ft_init_signals(void)
 
 int main(int ac, char **av, char **envp)
 {
+	rl_catch_signals = 0;
+    rl_catch_sigwinch = 0;
     ((void)ac, (void)av);
     init_shell(envp);
     while (1)

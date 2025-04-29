@@ -44,7 +44,6 @@ char		*ft_strrchr(const char *s, int c);
 size_t		ft_strlcat(char *dest, const char *src, size_t destsize);
 size_t		ft_strlcpy(char *dest, const char *src, size_t size);
 size_t		ft_strlen(const char *s);
-char		*ft_strncpy(char *dest, const char *src, size_t n);
 
 //fonction supplementaire
 char		*ft_substr(char const *s, unsigned int start, size_t len);

@@ -11,8 +11,7 @@ int ft_exit(t_shell *shell_program,char **args)
     i = 0;
     if (args[1] && args[2])
     {
-        shell_program->exit_status = 1;
-        error_commande("exit: too many arguments\n", 1);
+        error_message(shell_program, "exit: too many arguments", 1);
         return (1);
     }
     else if (args[1])
@@ -21,7 +20,7 @@ int ft_exit(t_shell *shell_program,char **args)
         {
             if(!ft_isdigit(args[1][i]))
             {
-                error_commande("ce n'est pas un nombre", 255);
+                error_message(shell_program, "Ce n'est pas un nombre", 255);
                 exit(255);
             }
             i++;

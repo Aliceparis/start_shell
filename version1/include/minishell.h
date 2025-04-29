@@ -4,7 +4,7 @@
 # include "libft.h"
 # include "tokenising.h"
 # include "parsing.h"
-# include "pipex.h"
+# include "ft_fprintf.h"
 
 # include <unistd.h>
 # include <stdio.h>
@@ -92,9 +92,13 @@ void ft_pwd(t_shell *shell_program);
 /************************unset.c******************************/
 t_env *ft_unset(t_env *env, const char *key);
 
-void reset_terminal(void);
-void	ft_init_signals(void);
+
+
+/*****************************util.c***************************/
+void error_message(t_shell *shell_program, const char *msg, int exit_s);
+
 void print_ast(ASTnode *node, int depth);
 
-
+void reset_terminal(void);
+void	ft_init_signals(void);
 # endif
