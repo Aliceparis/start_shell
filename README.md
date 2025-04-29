@@ -22,3 +22,11 @@ Ajout dossier de pipex
 
 
 **ft_fprintf OK**
+
+
+**Les commades qui marche**:
+- echo
+- exit
+- pwd
+- env(petit pb a regler)
+- ls
