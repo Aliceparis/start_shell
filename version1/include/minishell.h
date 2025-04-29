@@ -92,7 +92,10 @@ void ft_pwd(t_shell *shell_program);
 /************************unset.c******************************/
 t_env *ft_unset(t_env *env, const char *key);
 
-
+/************************free.c******************************/
+void free_token(t_token *token);
+void free_ast(ASTnode *node);
+void free_envlist(t_env *env);
 
 /*****************************util.c***************************/
 void error_message(t_shell *shell_program, const char *msg, int exit_s);
