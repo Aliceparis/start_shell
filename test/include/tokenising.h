@@ -3,6 +3,7 @@
 
 /*括号是否是一个token的分隔符号？ */
 
+typedef struct s_shell t_shell;
 typedef enum e_token_type
 {
     IS_WORD,
@@ -33,7 +34,7 @@ char    *get_token_between_quote(char **input);
 int is_token_operator(char *input);
 char    *get_token_operator(char **input);
 char    *get_token_word(char **input);
-void    ft_token(char   *line);
+void    ft_token(char   *line, t_shell *shell_program);
 token_type    get_type_of_token(char *str);
 void update_token_value(token_type type, char *value, t_token **token_list);
 

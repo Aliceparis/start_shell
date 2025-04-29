@@ -17,23 +17,23 @@ t_env    *envlist_new(char *key, char *value)
     new = malloc(sizeof(t_env));
     if (!new)
         return (NULL);
-    new->key = key;
-    new->value = value;
+    new->key = ft_strdup(key);
+    new->value = ft_strdup(value);
     new->next = NULL;
     return (new);
 }
 
-void   ft_envlist_addback(t_env *list)
+void   ft_envlist_addback(t_env **envlist, t_env *new)
 {
     t_env   *current;
 
-    if (!shell_program.envlist)
+    if (!*envlist)
     {
-        shell_program.envlist = list;
+        *envlist = new;
         return ;
     }
-    current = shell_program.envlist;
+    current = *envlist;
     while (current && current->next)
         current = current->next;
-    current->next = list;
+    current->next = new;
 }

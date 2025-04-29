@@ -3,29 +3,21 @@
 /*!!!!!!expand_comande + ft_expand_ast non test*/
 void	ft_expand_ast(ASTnode *node)
 {
-	ASTnode	*tmp;
-
-	tmp = node;
 	if (!node)
 	////fonction error and free (error : )
-	while (node)
+	if (node->file)
+		expand_word(node->file);
+	if (node->type == CMD)
 	{
-		if (node->type == CMD)
-		{
-			expande_commande(node);
-			break ;
-		}
-		else if (node->type == PIPE)
-		{
-			ft_expand_ast(node->left);
-			ft_expand_ast(node->right);
-			break;
-		}
-		else if (node->type == REDIRECTION)
-			ft_expand_ast(node->left);
-		if (node->file)
-			expand_word(node->file);
+		expande_commande(node);
 	}
+	else if (node->type == PIPE)
+	{
+		ft_expand_ast(node->left);
+		ft_expand_ast(node->right);
+	}
+	else if (node->type == REDIRECTION)
+		ft_expand_ast(node->left);
 }
 void	expande_commande(ASTnode *node)
 {
@@ -36,6 +28,11 @@ void	expande_commande(ASTnode *node)
 	while (node->args[i])
 	{
 		expanded = expand_word(node->args[i]);
+		if (!expanded)  // 处理扩展失败的情况
+        {
+            fprintf(stderr, "Error: expansion failed for argument %d\n", i);
+            return;
+        }
 		free(node->args[i]);
 		node->args[i] = expanded;
 		i++;
@@ -64,6 +61,7 @@ char	*expand_word(char *str)
 			tmp = content_with_variable(str, &i);
 		else
 			tmp = content_simple(str, &i);
+		//printf("tmp expand_word :%s\n", tmp);
 		resultat = joint_and_free(resultat, tmp);
 		if (tmp)
 			free(tmp);

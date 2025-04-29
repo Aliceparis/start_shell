@@ -8,7 +8,7 @@ void ft_echo(t_shell *shell_program, char **args)
 
     i = 1;
     line = 1;
-    printf("je suis la");
+    //printf("je suis la");
     if (args[i] && ft_strcmp(args[i], "-n") == 0)
     {
         line = 0;

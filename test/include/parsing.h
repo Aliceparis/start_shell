@@ -30,8 +30,8 @@ typedef struct e_node
 }ASTnode;
 
 /*******************parse.c*******************************/
-ASTnode	*ft_parse(t_token **token);
-ASTnode	*simple_commande(t_token **token);
+ASTnode	*ft_parse(t_token **token, t_shell *shell_program);
+ASTnode	*simple_commande(t_token **token, t_shell *shell_program);
 
 /*********************expansion.c**************************/
 void	ft_expand_ast(ASTnode *node);

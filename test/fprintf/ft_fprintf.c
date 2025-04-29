@@ -21,7 +21,7 @@ int ft_fprintf(FILE *stream, const char *format, ...)
             cpt += ft_putall_fd(format[i], &a, fd);
         }
         else 
-            cpt += ft_putchar_fd(format[i], fd);
+            cpt += ft_printchar_fd(format[i], fd);
         i++;
     }
     va_end(a);
@@ -37,20 +37,20 @@ int ft_putall_fd(char c, va_list *a, int fd)
     if (c == 'd')
         cpt += ft_print10_fd(va_arg(*a, int), fd);
     else if (c == 'x')
-        cpt += ft_putnbr_fd(va_arg(*a, unsigned int), 16, fd);
+        cpt += ft_printnbr_fd(va_arg(*a, unsigned int), 16, fd);
     else if (c == 's')
-        cpt += ft_putstr_fd(va_arg(*a, char *), fd);
+        cpt += ft_printstr_fd(va_arg(*a, char *), fd);
     else if (c == 'p')
         cpt += ft_print_pointer_fd(va_arg(*a, void *), fd);
     else if (c == '%')
-        cpt += ft_putchar_fd('%', fd);
+        cpt += ft_printchar_fd('%', fd);
     else
-        cpt += ft_putchar_fd(c, fd);
+        cpt += ft_printchar_fd(c, fd);
     return (cpt);
 }
 
 
-int main(int ac, char **av)
+/*int main(int ac, char **av)
 {
     FILE *f;
     int nombre;
@@ -73,4 +73,4 @@ int main(int ac, char **av)
     ft_fprintf(f, "Fichier -> Nombre: %d, Message: %s\n", nombre, message);
     fclose(f);
     return (0);
-}
+}*/

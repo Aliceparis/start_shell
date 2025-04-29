@@ -6,25 +6,28 @@
   4. 当token类型什么也不是的时候，结束运行*/
 
   /*？？？？token type rediction append + redirection heredoc 有待处理*/
-ASTnode	*ft_parse(t_token **token)
+ASTnode	*ft_parse(t_token **token, t_shell *shell_program)
 {
 	ASTnode *left;
 	ASTnode	*node;
 	
 	if (!token || !(*token)) //保护
 		return (NULL);
-	left = simple_commande(token);
+	left = simple_commande(token, shell_program);
 	while (*token)
 	{
 		if ((*token)->type == IS_PIPE)
 		{
 			node = malloc(sizeof(ASTnode));
 			if (!node)
-		////fonction error and free (error: malloc echoue)
+			{
+				error_message(shell_program, "Error: Malloc Astnode failed.\n", 1);
+				free_all(shell_program);
+			}
 			*token = (*token)->next;
 			node->left = left;
 			node->type = PIPE;
-			node->right = ft_parse(token);
+			node->right = ft_parse(token, shell_program);
 			left = node;
 		}
 		else if ((*token)->type == REDICT_OUT || (*token)->type == REDICT_IN || (*token)->type == IS_HEREDOC || (*token)->type == REDICT_APPEND)
@@ -32,25 +35,31 @@ ASTnode	*ft_parse(t_token **token)
 			node = malloc(sizeof(ASTnode));
 			if (!node)
 		////fonction error and free (error: malloc echoue)
+			{
+				error_message(shell_program, "Error: Malloc Astnode failed.\n", 1);
+				free_all(shell_program);
+			}
 			node->operator = (*token)->value;
 			*token = (*token)->next;
 			if (!(*token) && (*token)->type != IS_WORD)
-				printf("token est null\n");////fonction error and free (error: expected filename or deliminiter)
+			{
+				error_message(shell_program, "Error: token est null.\n", 1);
+				free_all(shell_program);
+			}
 			node->file = ft_strdup((*token)->value);
 			*token = (*token)->next;
 			node->type = REDIRECTION;
 			node->left = left;
-			node->right = ft_parse(token);
+			node->right = ft_parse(token, shell_program);
 			left = node;
 		}
 		else
 			break ;
 	}
-	printf("left dans ast value:%s, type: %u\n", left->args[0], left->type);
 	return (left);
 }
 
-ASTnode	*simple_commande(t_token **token)
+ASTnode	*simple_commande(t_token **token, t_shell *shell_program)
 {
 	t_token	*tmp;
 	int	count_args;
@@ -60,6 +69,8 @@ ASTnode	*simple_commande(t_token **token)
 
 	tmp = *token;
 	count_args = 0;
+	args = NULL;
+	node = NULL;
 	i = 0;
 	while (tmp && tmp->type == IS_WORD)
 	{
@@ -69,7 +80,10 @@ ASTnode	*simple_commande(t_token **token)
 	args = malloc(sizeof(char *) * (count_args + 1));
 	if (!args)
 		////fonction error and free (error: malloc echoue)
-		printf("malloc commande args failed\n");
+	{
+		error_message(shell_program, "Error: Malloc args failed.\n", 1);
+		free_all(shell_program);
+	}
 	while (*token && (*token)->type == IS_WORD)
 	{
 		args[i++] = ft_strdup((*token)->value);
@@ -78,10 +92,15 @@ ASTnode	*simple_commande(t_token **token)
 	args[i] = NULL;
 	node = malloc(sizeof(ASTnode));
 	if (!node)
-	////fonction error and free (error: malloc echoue)
+	{
+		error_message(shell_program, "Error: Malloc Astnode failed.\n", 1);
+		free_all(shell_program);
+	}
 	node->type = CMD;
 	node->args = args;
-	node->left = node->right = NULL;
+	node->file = NULL;
+	node->operator = NULL;
+	node->left = node->right =  NULL;
 	return (node);
 }
 void print_ast(ASTnode *node, int depth)
@@ -101,7 +120,6 @@ void print_ast(ASTnode *node, int depth)
             printf("type : %u, Arg: %s\n", node->type, node->args[i]);
         }
     }
-
     if (node->file)
     {
         for (int j = 0; j < depth; j++)

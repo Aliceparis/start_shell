@@ -4,7 +4,7 @@
 # include "libft.h"
 # include "tokenising.h"
 # include "parsing.h"
-# include "pipex.h"
+# include "ft_fprintf.h"
 
 # include <unistd.h>
 # include <stdio.h>
@@ -42,20 +42,19 @@ typedef struct s_shell
     bool signint_child;
 }t_shell;
 
-extern t_shell shell_program;
 
 /*******************main.c********************/
-void    init_shell(char **env);
-
+void    init_shell(t_shell *shell_program, char **env);
+void reset_terminal(void);
 /******************init_env.c*******************/
-void    init_envlist(void);
+void    init_envlist(t_shell *shell_program);
 char    *get_key_env(char *str);
 char    *get_value_env(char *str);
-void    update_envlist(char *key, char *value);
+void    update_envlist(t_shell *shell_program, char *key, char *value);
 
 /******************env_util.c*******************/
 t_env    *envlist_new(char *key, char *value);
-void   ft_envlist_addback(t_env *list);
+void   ft_envlist_addback(t_env **envlist, t_env *new);
 
 /******************execute_buildin.c*******************/
 void excute_builtin(t_shell *shell_program, char **args);
@@ -92,9 +91,23 @@ void ft_pwd(t_shell *shell_program);
 /************************unset.c******************************/
 t_env *ft_unset(t_env *env, const char *key);
 
-void reset_terminal(void);
-void	ft_init_signals(void);
+
+
+/*****************************util.c***************************/
+void error_message(t_shell *shell_program, const char *msg, int exit_s);
+
+/***************************free.c*****************************/
+void free_token(t_token *token);
+void free_ast(ASTnode *node);
+void free_envlist(t_env *env);
+void	free_all(t_shell *shell_program);
+void    exit_minishell(t_shell shell_program);
+
+/*********************************herdoc.c*********************/
+void sigint_handler(int sig);
+void start_heredoc(const char *delimiter);
+
 void print_ast(ASTnode *node, int depth);
 
-
+void	ft_init_signals(t_shell *shell_program);
 # endif

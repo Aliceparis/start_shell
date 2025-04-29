@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include "pipex.h"
 
 /*PIPEX FONCTION FILE: utils.c*/
 void	free_array(char **arr)
@@ -61,7 +60,6 @@ void	execute(char *argv, char **envp)
 	char	*path;
 
 	cmd = ft_split(argv, ' ');
-    printf("%s\n", cmd[0]);
 	if (!cmd)
 		error_commande("command split failed", 1);
 	path = find_path(cmd[0], envp);
@@ -100,10 +98,7 @@ void dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
             shell_program->exit_status = 1;
     }
     else
-    {
-        error_commande("fork error", 1);
-        shell_program->exit_status = 1;
-    }
+		error_message(shell_program, "fork error", 1);
     shell_program->exit_status = 0;
 }
 
@@ -116,11 +111,12 @@ void dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
     if (!ast || ast->type != PIPE)
         shell_program->exit_status = 1;
     if (pipe(fd) == -1)
-        error_commande("pipe error", 1);
+        error_message(shell_program, "pipe error", 1);
     if (fork() == 0)
     {
         dup2(fd[1], STDOUT_FILENO);
         close(fd[0]);
+		close(fd[1]);
         dispatch_command(shell_program, ast->left);// 递归调度左子树
         exit(shell_program->exit_status);
     }
@@ -133,6 +129,7 @@ void dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
     }
     close(fd[0]);
     close(fd[1]);
+	close(fd[0]);
     while (waitpid(-1, NULL, 0) > 0)
         ;
     shell_program->exit_status = 0;
