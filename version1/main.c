@@ -65,18 +65,17 @@ int main(int ac, char **av, char **envp)
 			break ;
         add_history(shell_program.line);
         ft_token(shell_program.line, &shell_program);
-		if (!shell_program.token_list)
-			continue;
-		shell_program.ast = ft_parse(&shell_program.token_list, &shell_program);
-		//print_ast(shell_program.ast, 0);
-		//printf("after expansion\n");
-        ft_expand_ast(shell_program.ast);
-		//printf("after expansion\n");
-        //print_ast(shell_program.ast, 0);
-        dispatch_command(&shell_program, shell_program.ast);
-		free(shell_program.line);
-		//free_token(shell_program.token_list);
+		if (shell_program.token_list)
+		{
+			shell_program.ast = ft_parse(&shell_program.token_list, &shell_program);
+			ft_expand_ast(shell_program.ast);
+			dispatch_command(&shell_program, shell_program.ast);
+		}
+		free_token(shell_program.token_list);
+		shell_program.token_list = NULL;
 		free_ast(shell_program.ast);
+		shell_program.ast = NULL;
+		free(shell_program.line);
     }
 // 恢复终端设置
     reset_terminal();

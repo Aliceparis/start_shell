@@ -56,6 +56,7 @@ ASTnode	*ft_parse(t_token **token, t_shell *shell_program)
 		else
 			break ;
 	}
+	free_token(*token);
 	return (left);
 }
 

@@ -97,7 +97,7 @@ t_env *ft_unset(t_env *env, const char *key);
 void error_message(t_shell *shell_program, const char *msg, int exit_s);
 
 /***************************free.c*****************************/
-void free_token(t_token *token);
+void free_token(t_token *list);
 void free_ast(ASTnode *node);
 void free_envlist(t_env *env);
 void	free_all(t_shell *shell_program);

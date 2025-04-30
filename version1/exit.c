@@ -26,7 +26,6 @@ int ft_exit(t_shell *shell_program, char **args)
             i++;
         }
         shell_program->exit_status = (unsigned char)(ft_atoi(args[1]));
-		printf("sortie in ft_exit\n");
 		free_all(shell_program);
         exit(shell_program->exit_status);
     }
@@ -36,6 +35,11 @@ int ft_exit(t_shell *shell_program, char **args)
 	{
         shell_program->exit_status = 0;
 	}
-	free_all(shell_program);
+	free_token(shell_program->token_list);
+	shell_program->token_list = NULL;
+	free_ast(shell_program->ast);
+	shell_program->ast = NULL;
+	free_envlist(shell_program->envlist);
+	shell_program->envlist = NULL;
     exit(0);
 }

@@ -1,16 +1,16 @@
 #include "minishell.h"
 
-void free_token(t_token *token)
+void free_token(t_token *list)
 {
     t_token *tmp;
 
-    while(token)
+    while(list)
     {
-        tmp = token;
-        token = token->next;
-        free(tmp->value);
-        //Besoin de free token->type??
-        free(tmp);
+
+		tmp = list->next;
+		free(list->value);   // value 是 strdup 出来的
+		free(list);          // 释放结构体本身
+		list = tmp;
     }
 }
 
@@ -56,13 +56,25 @@ void free_envlist(t_env *env)
 void	free_all(t_shell *shell_program)
 {
 	if (shell_program->token_list)
+	{
 		free_token(shell_program->token_list);
+		shell_program->token_list = NULL;
+	}
 	if (shell_program->ast)
+	{
 		free_ast(shell_program->ast);
+		shell_program->ast = NULL;
+	}
 	if (shell_program->envlist)
+	{
 		free_envlist(shell_program->envlist);
+		shell_program->envlist = NULL;
+	}
 	if (shell_program->line)
+	{
 		free(shell_program->line);
+		shell_program->line = NULL;
+	}
 	//if (shell_program)
 		//free(shell_program);
 }
