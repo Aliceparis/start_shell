@@ -54,7 +54,7 @@ void	error_commande(char *msg, int status)
 	exit(status);
 }
 
-void	execute(char *argv, char **envp)
+void	execute(char *argv, char **envp, t_shell *shell_program)
 {
 	char	**cmd;
 	char	*path;
@@ -66,6 +66,7 @@ void	execute(char *argv, char **envp)
 	if (!path)
 	{
 		free_array(cmd);
+		free_all(shell_program);
 		error_commande("command not found", 127);
 	}
 	if (execve(path, cmd, envp) == -1)
@@ -86,7 +87,7 @@ void dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
     pid = fork();
     if (pid == 0)
     {
-        execute(ast->args[0], shell_program->environ);
+        execute(ast->args[0], shell_program->environ, shell_program);
         exit(0);
     }
     else if (pid > 0)
@@ -116,6 +117,7 @@ void dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
     {
         dup2(fd[1], STDOUT_FILENO);
         close(fd[0]);
+		close(fd[1]);
         dispatch_command(shell_program, ast->left);// 递归调度左子树
         exit(shell_program->exit_status);
     }
@@ -128,6 +130,7 @@ void dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
     }
     close(fd[0]);
     close(fd[1]);
+	close(fd[0]);
     while (waitpid(-1, NULL, 0) > 0)
         ;
     shell_program->exit_status = 0;

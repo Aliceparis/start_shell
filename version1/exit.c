@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int ft_exit(t_shell *shell_program,char **args)
+int ft_exit(t_shell *shell_program, char **args)
 {
     int i;
 
@@ -26,11 +26,16 @@ int ft_exit(t_shell *shell_program,char **args)
             i++;
         }
         shell_program->exit_status = (unsigned char)(ft_atoi(args[1]));
+		printf("sortie in ft_exit\n");
+		free_all(shell_program);
         exit(shell_program->exit_status);
     }
     else if(args[1])
         shell_program->exit_status = ft_atoi(args[1]);
     else
+	{
         shell_program->exit_status = 0;
+	}
+	free_all(shell_program);
     exit(0);
 }

@@ -57,7 +57,7 @@ void start_heredoc(const char *delimiter)
     printf("heredoc terminé\n");
 }
 
-int main()
+/*int main()
 {
     char *delimiter = "EOF";
 
@@ -69,5 +69,5 @@ int main()
         printf("Lecture de stdin après heredoc: %s", buffer);
 
     return 0;
-}
+}*/
 

@@ -20,59 +20,66 @@ static void	ft_sigint_handler(int num)
 		rl_redisplay();
 	}
 }
-void    init_shell(char **env)
+void    init_shell(t_shell *shell_program, char **env)
 {
-    ft_memset(&shell_program, 0, sizeof(t_shell));
-    shell_program.environ = env;
-    init_envlist();
-    shell_program.stdin = dup(0);
-    shell_program.stdout = dup(1);
-    tcgetattr(STDIN_FILENO, &shell_program.oldt);
+    shell_program->environ = env;
+	shell_program->envlist = NULL;
+	shell_program->token_list = NULL;
+	shell_program->ast = NULL;
+	init_envlist(shell_program);
+	shell_program->stdin = dup(0);
+    shell_program->stdout = dup(1);
+    tcgetattr(STDIN_FILENO, &shell_program->oldt);
 }
 
 void reset_terminal(void)
 {
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // 恢复原始设置
 }
-void	ft_init_signals(void)
+void	ft_init_signals(t_shell *shell_program)
 {
 	struct termios	term;
 
-	term = shell_program.oldt;
+	term = shell_program->oldt;
 	term.c_lflag &= ~ECHOCTL;
 	tcsetattr(STDIN_FILENO, TCSANOW, &term);
-	shell_program.heredoc_sigint = false;
-	shell_program.signint_child = false;
+	shell_program->heredoc_sigint = false;
+	shell_program->signint_child = false;
 	signal(SIGINT, ft_sigint_handler);
 	signal(SIGQUIT, SIG_IGN);
 }
 
 int main(int ac, char **av, char **envp)
 {
+	t_shell	shell_program;
+
 	rl_catch_signals = 0;
     rl_catch_sigwinch = 0;
     ((void)ac, (void)av);
-    init_shell(envp);
+    init_shell(&shell_program, envp);
     while (1)
     {
-        ft_init_signals();
+        ft_init_signals(&shell_program);
         shell_program.line = readline("Minishell> ");
-        if (shell_program.line)
-        {	
-            add_history(shell_program.line);
-            ft_token(shell_program.line, &(shell_program.token_list));
-		    shell_program.ast = ft_parse(&shell_program.token_list);
-			//print_ast(shell_program.ast, 0);
-			//printf("after expansion\n");
-            ft_expand_ast(shell_program.ast);
-			//printf("after expansion\n");
-            //print_ast(shell_program.ast, 0);
-            dispatch_command(&shell_program, shell_program.ast);
-        }
-        else
-            break ;///fonction free and error ?????
+        if (!shell_program.line)
+			break ;
+        add_history(shell_program.line);
+        ft_token(shell_program.line, &shell_program);
+		if (!shell_program.token_list)
+			continue;
+		shell_program.ast = ft_parse(&shell_program.token_list, &shell_program);
+		//print_ast(shell_program.ast, 0);
+		//printf("after expansion\n");
+        ft_expand_ast(shell_program.ast);
+		//printf("after expansion\n");
+        //print_ast(shell_program.ast, 0);
+        dispatch_command(&shell_program, shell_program.ast);
+		free(shell_program.line);
+		//free_token(shell_program.token_list);
+		free_ast(shell_program.ast);
     }
 // 恢复终端设置
     reset_terminal();
+	free_all(&shell_program);
     return 0;
 }

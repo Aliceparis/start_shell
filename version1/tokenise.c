@@ -117,29 +117,33 @@ char    *get_token_word(char **input)
         return (resultat);
     }
     
-void    ft_token(char   *line, t_token **token_list)
-    {
-        char    *value;
+void    ft_token(char   *line, t_shell *shell_program)
+{
+    char    *value;
     
-        value = NULL;
-        if (!is_quote_close(line))
-        {
-            /////fonction de quite et free, (error : error syntax)??????
-            printf("Error: unmatched quote found in input.\n");
-            exit(EXIT_FAILURE);
-        }
-        while (*line)
-        {
-            skip_space(&line); 
-            if (is_quote(*line))
-                value = get_token_between_quote(&line); 
-            else if (is_token_operator(line))
-                value = get_token_operator(&line);
-            else
-                value = get_token_word(&line);
-            update_token_value(get_type_of_token(value), value, token_list);
-        }
+    value = NULL;
+    if (!is_quote_close(line))
+    {
+        /////fonction de quite et free, (error : error syntax)??????
+		error_message(shell_program, "Error: unmatched quote found in input.\n", 1);
+		free_all(shell_program);	
+		exit(1);
     }
+    while (*line)
+    {
+        skip_space(&line); 
+        if (is_quote(*line))
+            value = get_token_between_quote(&line); 
+        else if (is_token_operator(line))
+            value = get_token_operator(&line);
+        else
+            value = get_token_word(&line);
+		if (value)
+			update_token_value(get_type_of_token(value), ft_strdup(value), &shell_program->token_list);
+		free(value);
+    }
+}
+
 
 token_type    get_type_of_token(char *str)
     {
@@ -172,8 +176,8 @@ void update_token_value(token_type type, char *value, t_token **token_list)
     else
     {
         tmp = *token_list;
-        while (tmp->next)
-                tmp = tmp->next;
+		while (tmp->next)
+			tmp = tmp->next;
         tmp->next = new;
-    }
+	}
 }

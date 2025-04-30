@@ -32,8 +32,10 @@ void free_ast(ASTnode *node)
         }
         free(node->args);
     }
-    free(node->file);
-    free(node->operator);
+	if (node->file)
+    	free(node->file);
+	if (node->operator)
+    	free(node->operator);
     free(node);
 }
 
@@ -51,7 +53,20 @@ void free_envlist(t_env *env)
     }
 }
 
-void    exit_minishell(void)
+void	free_all(t_shell *shell_program)
+{
+	if (shell_program->token_list)
+		free_token(shell_program->token_list);
+	if (shell_program->ast)
+		free_ast(shell_program->ast);
+	if (shell_program->envlist)
+		free_envlist(shell_program->envlist);
+	if (shell_program->line)
+		free(shell_program->line);
+	//if (shell_program)
+		//free(shell_program);
+}
+void    exit_minishell(t_shell shell_program)
 {
     if (shell_program.stdin != -1)
         close(shell_program.stdin);

@@ -9,7 +9,7 @@ CFLAGS = -Wall -Wextra -Werror -g3 -Ilibft -I$(HEADER)
 VAL_FLAGS = --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes --suppressions=supp.supp
 
 SRC = cd.c dispatch_commande.c echo.c env.c execute_buildin.c exit.c expansion.c export.c init_env.c main.c \
-	parse.c pwd.c tokenise.c unset.c utils.c fprintf/ft_fprintf.c fprintf/ft_putall.c
+	parse.c pwd.c tokenise.c unset.c utils.c fprintf/ft_fprintf.c fprintf/ft_putall.c heredoc.c free.c
 OBJ = $(SRC:.c=.o)
 
 all : $(LIBFT) $(NAME)
