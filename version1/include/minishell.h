@@ -46,11 +46,13 @@ typedef struct s_shell
 /*******************main.c********************/
 void    init_shell(t_shell *shell_program, char **env);
 void reset_terminal(void);
+
 /******************init_env.c*******************/
 void    init_envlist(t_shell *shell_program);
 char    *get_key_env(char *str);
 char    *get_value_env(char *str);
 void    update_envlist(t_shell *shell_program, char *key, char *value);
+void    *clean_old_content(void *ptr, bool clean);
 
 /******************env_util.c*******************/
 t_env    *envlist_new(char *key, char *value);
@@ -97,11 +99,13 @@ t_env *ft_unset(t_env *env, const char *key);
 void error_message(t_shell *shell_program, const char *msg, int exit_s);
 
 /***************************free.c*****************************/
-void free_token(t_token *list);
-void free_ast(ASTnode *node);
+void free_token(t_token **list);
+//void free_ast(ASTnode *node);
 void free_envlist(t_env *env);
 void	free_all(t_shell *shell_program);
 void    exit_minishell(t_shell shell_program);
+void	free_cmd_node(ASTnode *node);
+void free_ast(t_shell *shell_program);
 
 /*********************************herdoc.c*********************/
 void sigint_handler(int sig);

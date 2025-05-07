@@ -46,7 +46,7 @@ ASTnode	*ft_parse(t_token **token, t_shell *shell_program)
 				error_message(shell_program, "Error: token est null.\n", 1);
 				free_all(shell_program);
 			}
-			node->file = ft_strdup((*token)->value);
+			node->file = clean_old_content(ft_strdup((*token)->value), false);
 			*token = (*token)->next;
 			node->type = REDIRECTION;
 			node->left = left;
@@ -56,7 +56,7 @@ ASTnode	*ft_parse(t_token **token, t_shell *shell_program)
 		else
 			break ;
 	}
-	free_token(*token);
+	free_token(token);
 	return (left);
 }
 
@@ -87,7 +87,7 @@ ASTnode	*simple_commande(t_token **token, t_shell *shell_program)
 	}
 	while (*token && (*token)->type == IS_WORD)
 	{
-		args[i++] = ft_strdup((*token)->value);
+		args[i++] = clean_old_content(ft_strdup((*token)->value), false);
 		*token = (*token)->next;
 	}
 	args[i] = NULL;

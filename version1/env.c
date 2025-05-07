@@ -14,11 +14,12 @@ t_env    *envlist_new(char *key, char *value)
 {
     t_env   *new;
 
-    new = malloc(sizeof(t_env));
+    new = ft_calloc(1, sizeof(t_env));
     if (!new)
         return (NULL);
-    new->key = ft_strdup(key);
-    new->value = ft_strdup(value);
+    new->key = clean_old_content(ft_strdup(key), false);
+	if (value)
+    	new->value = clean_old_content(ft_strdup(value), false);
     new->next = NULL;
     return (new);
 }

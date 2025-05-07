@@ -71,9 +71,9 @@ int main(int ac, char **av, char **envp)
 			ft_expand_ast(shell_program.ast);
 			dispatch_command(&shell_program, shell_program.ast);
 		}
-		free_token(shell_program.token_list);
+		free_token(&(shell_program.token_list));
 		shell_program.token_list = NULL;
-		free_ast(shell_program.ast);
+		free_ast(&shell_program);
 		shell_program.ast = NULL;
 		free(shell_program.line);
     }

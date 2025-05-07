@@ -15,7 +15,7 @@ OBJ = $(SRC:.c=.o)
 all : $(LIBFT) $(NAME)
 	
 $(LIBFT) : 
-	@make -C libft all > /dev/null && echo "✅ compile libft réussi"
+	@make -C libft bonus > /dev/null && echo "✅ compile libft réussi"
 
 $(NAME) : $(OBJ)
 

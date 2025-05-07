@@ -12,6 +12,7 @@ int ft_exit(t_shell *shell_program, char **args)
     if (args[1] && args[2])
     {
         error_message(shell_program, "exit: too many arguments", 1);
+		printf("exit 1 !\n");
         return (1);
     }
     else if (args[1])
@@ -35,9 +36,9 @@ int ft_exit(t_shell *shell_program, char **args)
 	{
         shell_program->exit_status = 0;
 	}
-	free_token(shell_program->token_list);
+	free_token(&(shell_program->token_list));
 	shell_program->token_list = NULL;
-	free_ast(shell_program->ast);
+	free_ast(shell_program);
 	shell_program->ast = NULL;
 	free_envlist(shell_program->envlist);
 	shell_program->envlist = NULL;

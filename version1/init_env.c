@@ -8,27 +8,13 @@ void    init_envlist(t_shell *shell_program)
     char    *value;
 
     environ = shell_program->environ;
-	key = NULL;
-	value = NULL;
     if (!environ)
         return ;
     i = 0;
     while (environ[i])
     {
-		if (!key)
-        	key = get_key_env(environ[i]);
-		else
-		{
-			free(key);
-			key = get_key_env(environ[i]);
-		}
-		if (!value)
-	        value = get_value_env(environ[i]);
-		else
-		{
-			free(value);
-			value = get_key_env(environ[i]);
-		}
+        key = get_key_env(environ[i]);
+        value = get_value_env(environ[i]);
         update_envlist(shell_program, key, value);
         i++;
     }
@@ -42,7 +28,7 @@ char    *get_key_env(char *str)
     while (str[i])
     {
         if (str[i] == '=')
-            return (ft_substr(str, 0, i));
+            return (clean_old_content(ft_substr(str, 0, i), false));
         i++;
     }
     return (ft_strdup(str));
@@ -51,38 +37,54 @@ char    *get_key_env(char *str)
 char    *get_value_env(char *str)
 {
     int i;
-	char	*resultat;
 
     i = 0;
-	resultat = NULL;
     while (str[i])
     {
         if (str[i] == '=')
         {
             i++;
-            resultat = ft_substr(str, i, ft_strlen(str) - i);
+            return (clean_old_content(ft_substr(str, i, ft_strlen(str) - i), false));
         }
         i++;
     }
-    return (resultat);
+    return (NULL);
 }
 void    update_envlist(t_shell *shell_program, char *key, char *value)
 {
     t_env   *envlist;
 
-	envlist = shell_program->envlist;
+    envlist = shell_program->envlist;
     while (envlist)
     {
-        if (envlist->key && ft_strcmp(envlist->key, key) == 0)
+        if (!ft_strncmp(key, envlist->key, ft_strlen(key)))
         {
-			free(envlist->value);
-            envlist->value = ft_strdup(value);
-			free(key);
-			free(value);
+			if (value)
+            	envlist->value = clean_old_content(ft_strdup(value), false);
             return ;
         }
         envlist = envlist->next;
     }
     if (!envlist)
-		ft_envlist_addback(&(shell_program->envlist), envlist_new(key, value));
+        ft_envlist_addback(&(shell_program->envlist), envlist_new(key, value));
+}
+static void ft_del(void *ptr)
+{
+    free(ptr);
+    ptr = NULL;
+}
+void    *clean_old_content(void *ptr, bool clean)
+{
+    static t_list   *old_content;
+
+    if (clean)
+    {
+        ft_lstclear(&old_content, ft_del);
+        return (NULL);
+    }
+    else
+    {
+        ft_lstadd_back(&old_content, ft_lstnew(ptr));
+        return (ptr);
+    }
 }

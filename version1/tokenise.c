@@ -139,7 +139,7 @@ void    ft_token(char   *line, t_shell *shell_program)
         else
             value = get_token_word(&line);
 		if (value)
-			update_token_value(get_type_of_token(value), ft_strdup(value), &shell_program->token_list);
+			update_token_value(get_type_of_token(value), value, &shell_program->token_list);
 		free(value);
     }
 }
@@ -169,7 +169,7 @@ void update_token_value(token_type type, char *value, t_token **token_list)
     if (!new)
         return ;
     new->type = type;
-    new->value = value;
+    new->value = clean_old_content(ft_strdup(value), false);
     new->next = NULL;
     if (!*token_list)
         *token_list = new;

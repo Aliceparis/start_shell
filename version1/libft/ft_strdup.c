@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strdup.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmen <marvin@42.fr>                        +#+  +:+       +#+        */
+/*   By: jmen <jmen@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 15:14:24 by jmen              #+#    #+#             */
-/*   Updated: 2024/11/12 15:42:59 by jmen             ###   ########.fr       */
+/*   Updated: 2025/05/07 11:24:22 by jmen             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,3 +29,15 @@ char	*ft_strdup(const char *s)
 	resultat[i] = '\0';
 	return (resultat);
 }
+
+/*char	*ft_strdup(const char *s1)
+{
+	char	*s1cpy;
+	size_t	s1len;
+
+	s1len = ft_strlen(s1);
+	s1cpy = ft_calloc(s1len + 1, sizeof(char));
+	if (!s1cpy)
+		return (NULL);
+	return (ft_memcpy(s1cpy, s1, s1len));
+}*/
