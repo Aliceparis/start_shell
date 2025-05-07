@@ -66,7 +66,7 @@ int is_builtin(char *cmd);
 void	free_array(char **arr);
 char	*find_path(char *cmd, char **envp);
 void	error_commande(char *msg, int status);
-void	execute(char *argv, char **envp, t_shell *shell_program);
+//void	execute(char *argv, char **envp, t_shell *shell_program);
 void dispatch_simple_command(t_shell *shell_program, ASTnode *ast);
 void dispatch_pipeline(t_shell *shell_program, ASTnode *ast);
 void dispatch_command(t_shell *shell_program, ASTnode *ast);
