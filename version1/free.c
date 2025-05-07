@@ -92,13 +92,12 @@ void free_envlist(t_env *env)
 void	free_all(t_shell *shell_program)
 {
 	clean_old_content(NULL, true);
-	if (shell_program->token_list)
-	{
-		free_token(&(shell_program->token_list));
-		shell_program->token_list = NULL;
-	}
+	printf("free1\n");
+	free_token(&(shell_program->token_list));
+	shell_program->token_list = NULL;
 	if (shell_program)
 	{
+		printf("free2\n");
 		free_ast(shell_program);
 		shell_program->ast = NULL;
 	}

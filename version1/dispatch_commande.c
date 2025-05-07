@@ -54,10 +54,12 @@ void	error_commande(char *msg, int status)
 	exit(status);
 }
 
-static void	execute(char **cmd, char **envp, t_shell *shell_program)
+void	execute(char *argv, char **envp, t_shell *shell_program)
 {
+	char	**cmd;
 	char	*path;
 
+	cmd = ft_split(argv, ' ');
 	if (!cmd)
 		error_commande("command split failed", 1);
 	path = find_path(cmd[0], envp);
@@ -68,11 +70,8 @@ static void	execute(char **cmd, char **envp, t_shell *shell_program)
 		error_commande("command not found", 127);
 	}
 	if (execve(path, cmd, envp) == -1)
-    {
-        free_array(cmd);
-        free_all(shell_program);
 		error_commande("Execution failed", 126);
-    }
+    free_array(cmd);
 }
 
 /*simple cmd ou un builtin*/
@@ -82,20 +81,14 @@ void dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
     int status;
 
     if (!ast || ast->type != CMD)
-    {
         shell_program->exit_status = 1;
-        return ;
-    }
     if (is_builtin(ast->args[0]))
-    {
         excute_builtin(shell_program, ast->args);
-        return ;
-    }
     pid = fork();
     if (pid == 0)
     {
-        execute(ast->args, shell_program->environ, shell_program);
-        shell_program->exit_status = 0;
+        execute(ast->args[0], shell_program->environ, shell_program);
+        exit(0);
     }
     else if (pid > 0)
     {
@@ -106,10 +99,8 @@ void dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
             shell_program->exit_status = 1;
     }
     else
-    {
 		error_message(shell_program, "fork error", 1);
-        shell_program->exit_status = 1;
-    }
+    shell_program->exit_status = 0;
 }
 
 
@@ -152,14 +143,8 @@ void dispatch_command(t_shell *shell_program, ASTnode *ast)
     if (!ast)
         shell_program->exit_status = 0;
     if (ast->type == CMD)
-    {
         dispatch_simple_command(shell_program, ast);
-        return ;
-    }
     else if (ast->type == PIPE)
-    {
         dispatch_pipeline(shell_program, ast);
-        return ;
-    }
     shell_program->exit_status = 0;
 }

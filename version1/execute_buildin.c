@@ -14,11 +14,7 @@ void excute_builtin(t_shell *shell_program, char **args)
     else if (ft_strcmp(args[0], "echo") == 0)
         ft_echo(shell_program, args);
     else if (ft_strcmp(args[0], "cd") == 0)
-    {
-        printf("je rentre dans le cd\n");
         ft_cd(shell_program, args);
-        printf("je sort du cd\n");
-    }
     else if (ft_strcmp(args[0], "env") == 0)
         ft_env(shell_program, shell_program->envlist);
     else if (ft_strcmp(args[0], "unset") == 0)
@@ -51,6 +47,8 @@ void excute_builtin(t_shell *shell_program, char **args)
     }
 }
 
+
+
 int is_builtin(char *cmd)
 {
     if (!cmd)
@@ -71,4 +69,3 @@ int is_builtin(char *cmd)
         return (1);
     return (0);
 }
-
