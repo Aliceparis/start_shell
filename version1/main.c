@@ -71,14 +71,12 @@ int main(int ac, char **av, char **envp)
 			ft_expand_ast(shell_program.ast);
 			dispatch_command(&shell_program, shell_program.ast);
 		}
-		free_token(&(shell_program.token_list));
-		shell_program.token_list = NULL;
-		free_ast(&shell_program);
-		shell_program.ast = NULL;
-		free(shell_program.line);
+		/*free_token(&(shell_program.token_list));
+		shell_program.token_list = NULL;*/
+		printf("free in loop\n");
+		free_all(&shell_program);
     }
 // 恢复终端设置
     reset_terminal();
-	free_all(&shell_program);
     return 0;
 }
