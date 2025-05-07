@@ -36,6 +36,8 @@ char    *get_token_operator(char **input);
 char    *get_token_word(char **input);
 void    ft_token(char   *line, t_shell *shell_program);
 token_type    get_type_of_token(char *str);
-void update_token_value(token_type type, char *value, t_token **token_list);
+//void update_token_value(token_type type, char *value, t_token **token_list);
+t_token	*ft_new_token(char *value, token_type type);
+void	token_list_addback(t_token **token_list, t_token *new);
 
 #endif

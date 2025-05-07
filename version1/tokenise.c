@@ -119,7 +119,8 @@ char    *get_token_word(char **input)
 void    ft_token(char   *line, t_shell *shell_program)
 {
     char    *value;
-    
+    t_token	*token;
+	token_type	type;
     value = NULL;
     if (!is_quote_close(line))
     {
@@ -138,8 +139,13 @@ void    ft_token(char   *line, t_shell *shell_program)
         else
             value = get_token_word(&line);
 		if (value)
-			update_token_value(get_type_of_token(value), value, &shell_program->token_list);
-		free(value);
+		{
+			type = get_type_of_token(value);
+			token = ft_new_token(value, type);
+			if (!token)
+				free(value);
+			token_list_addback(&(shell_program->token_list), token);
+		}
     }
 }
 
@@ -159,14 +165,14 @@ token_type    get_type_of_token(char *str)
     return (IS_WORD);
 }
     
-void update_token_value(token_type type, char *value, t_token **token_list)
+/*void *update_token_value(token_type type, char *value, t_token **token_list)
 {
     t_token *new;
     t_token *tmp;
 
     new = malloc(sizeof(t_token));
     if (!new)
-        return ;
+        return (NULL);
     new->type = type;
     new->value = clean_old_content(ft_strdup(value), false);
     new->next = NULL;
@@ -179,5 +185,30 @@ void update_token_value(token_type type, char *value, t_token **token_list)
 			tmp = tmp->next;
         tmp->next = new;
 	}
-	//free(new);
+}*/
+
+t_token	*ft_new_token(char *value, token_type type)
+{
+	t_token	*new;
+
+	new = ft_calloc(1, sizeof(t_token));
+	if (!new)
+		return (NULL);
+	new->value = clean_old_content(value, false);
+	new->type = type;
+	return (new);
+}
+void	token_list_addback(t_token **token_list, t_token *new)
+{
+	t_token	*current;
+
+	if (!*token_list)
+	{
+		*token_list = new;
+		return ;
+	}
+	current = *token_list;
+	while (current && current->next)
+		current = current->next;
+	current->next = new;
 }

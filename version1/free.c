@@ -1,17 +1,21 @@
 #include "minishell.h"
 
-void free_token(t_token **list)
+void free_token(t_token **token)
 {
-    t_token *tmp;
+    t_token *current;
+	t_token	*next;
 
-    while(*list)
-    {
-
-		tmp = (*list)->next;
-		free((*list)->value);   // value 是 strdup 出来的
-		free(*list);          // 释放结构体本身
-		*list = tmp;
-    }
+    current = *token;
+	if (!current)
+		return ;
+	while (current)
+	{
+		free(current->value);
+		next = current->next;
+		free(current);
+		current = next;
+	}
+	*token = NULL;
 }
 
 /*void free_ast(ASTnode *node)
