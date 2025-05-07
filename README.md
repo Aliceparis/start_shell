@@ -18,6 +18,7 @@ Ajout dossier de pipex
 1. token中的单双引号是否保留
 2. token 中free有问题
 3. free ast有问题
+4. dup 和fd的处理，没有关闭
 5. 在echo 后面如果有没有闭合的情况下，现在是直接退出program，或许直接返回到pompt会更好？（返回到pompt的话，那么terminos的设置问题需要处理）
 6. $?值返回的设置在expansion那一部分还没有加进去
 
