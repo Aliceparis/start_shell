@@ -87,7 +87,7 @@ ASTnode	*simple_commande(t_token **token, t_shell *shell_program)
 	}
 	while (*token && (*token)->type == IS_WORD)
 	{
-		args[i++] = ft_strdup((*token)->value);
+		args[i++] =ft_strdup((*token)->value);
 		*token = (*token)->next;
 	}
 	args[i] = NULL;

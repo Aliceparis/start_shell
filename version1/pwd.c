@@ -8,7 +8,7 @@ void ft_pwd(t_shell *shell_program)
     char cwd[PATH_MAX];
 
     if (getcwd(cwd, PATH_MAX) != NULL)
-        printf("la value est :%s\n", cwd);
+        printf("%s\n", cwd);
     else
     {
         printf("pwd non trouve");

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmen <marvin@42.fr>                        +#+  +:+       +#+        */
+/*   By: yujin <yujin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 16:53:19 by jmen              #+#    #+#             */
-/*   Updated: 2024/11/22 17:25:17 by jmen             ###   ########.fr       */
+/*   Updated: 2025/05/07 10:53:28 by yujin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ char		*ft_strnstr(const char *dest, const char *to_find, size_t len);
 char		*ft_strrchr(const char *s, int c);
 size_t		ft_strlcat(char *dest, const char *src, size_t destsize);
 size_t		ft_strlcpy(char *dest, const char *src, size_t size);
+char		*ft_strncpy(char *dest, const char *src, size_t n);
 size_t		ft_strlen(const char *s);
 
 //fonction supplementaire
