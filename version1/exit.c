@@ -21,6 +21,7 @@ int ft_exit(t_shell *shell_program, char **args)
             if(!ft_isdigit(args[1][i]))
             {
                 error_message(shell_program, "Ce n'est pas un nombre", 255);
+                free_all(shell_program);
                 exit(255);
             }
             i++;

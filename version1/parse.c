@@ -51,7 +51,7 @@ ASTnode	*ft_parse(t_token **token, t_shell *shell_program)
 			node->type = REDIRECTION;
 			node->left = left;
 			node->right = ft_parse(token, shell_program);
-			left = node;
+			left = clean_old_content(node, false);
 		}
 		else
 			break ;
@@ -87,7 +87,7 @@ ASTnode	*simple_commande(t_token **token, t_shell *shell_program)
 	}
 	while (*token && (*token)->type == IS_WORD)
 	{
-		args[i++] =ft_strdup((*token)->value);
+		args[i++] =clean_old_content(ft_strdup((*token)->value), false);
 		*token = (*token)->next;
 	}
 	args[i] = NULL;

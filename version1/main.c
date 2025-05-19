@@ -8,7 +8,7 @@ static void	ft_sigint_handler(int num)
 	(void)num;
 	if (shell_program.signint_child)
 	{
-		ft_putstr_fd("\n", 1);
+		//ft_putstr_fd("\n", 1);
 		shell_program.signint_child = false;
 		shell_program.heredoc_sigint = true;
 	}
@@ -70,7 +70,7 @@ int main(int ac, char **av, char **envp)
 		if (shell_program.token_list)
 		{
 			shell_program.ast = ft_parse(&shell_program.token_list, &shell_program);
-			ft_expand_ast(shell_program.ast);
+			ft_expand_ast(shell_program.ast, &shell_program);
 			dispatch_command(&shell_program, shell_program.ast);
 		}
 		/*

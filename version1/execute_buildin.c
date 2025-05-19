@@ -47,8 +47,6 @@ void excute_builtin(t_shell *shell_program, char **args)
     }
 }
 
-
-
 int is_builtin(char *cmd)
 {
     if (!cmd)

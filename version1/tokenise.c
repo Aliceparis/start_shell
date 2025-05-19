@@ -7,9 +7,9 @@
     4. get others information, is the word token type
     5. update the type and the value ine the structure*/
 int ft_isspace(char c )
-    {
-        if ((c >= 9 && c <= 13) || c == ' ')
-            return (1);
+{
+    if ((c >= 9 && c <= 13) || c == ' ')
+       return (1);
     
         return (0);
     }

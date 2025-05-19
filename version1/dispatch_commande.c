@@ -54,24 +54,26 @@ void	error_commande(char *msg, int status)
 	exit(status);
 }
 
-void	execute(char *argv, char **envp, t_shell *shell_program)
+static void	execute(char **cmd, char **envp, t_shell *shell_program)
 {
-	char	**cmd;
 	char	*path;
 
-	cmd = ft_split(argv, ' ');
+    (void)shell_program;
 	if (!cmd)
 		error_commande("command split failed", 1);
 	path = find_path(cmd[0], envp);
 	if (!path)
 	{
-		free_array(cmd);
+		//free_array(cmd);
 		free_all(shell_program);
 		error_commande("command not found", 127);
 	}
 	if (execve(path, cmd, envp) == -1)
+    {
+        free_array(cmd);
+        //free_all(shell_program);
 		error_commande("Execution failed", 126);
-    free_array(cmd);
+    }
 }
 
 /*simple cmd ou un builtin*/
@@ -81,14 +83,22 @@ void dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
     int status;
 
     if (!ast || ast->type != CMD)
+    {
         shell_program->exit_status = 1;
+        return ;
+    }
     if (is_builtin(ast->args[0]))
+    {
         excute_builtin(shell_program, ast->args);
+        //free_all(shell_program);
+        return ;
+    }
     pid = fork();
     if (pid == 0)
     {
-        execute(ast->args[0], shell_program->environ, shell_program);
-        exit(0);
+        execute(ast->args, shell_program->environ, shell_program);
+        free_all(shell_program);
+        shell_program->exit_status = 0;
     }
     else if (pid > 0)
     {
@@ -99,8 +109,10 @@ void dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
             shell_program->exit_status = 1;
     }
     else
+    {
 		error_message(shell_program, "fork error", 1);
-    shell_program->exit_status = 0;
+        shell_program->exit_status = 1;
+    }
 }
 
 
@@ -115,14 +127,17 @@ void dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
         error_message(shell_program, "pipe error", 1);
     if (fork() == 0)
     {
+        printf("pipe 2\n");
         dup2(fd[1], STDOUT_FILENO);
         close(fd[0]);
 		close(fd[1]);
         dispatch_command(shell_program, ast->left);// 递归调度左子树
+        //free_all(shell_program);
         exit(shell_program->exit_status);
     }
     if (fork() == 0)
     {
+        printf("pipe 1\n");
         dup2(fd[0], STDIN_FILENO);
         close(fd[1]);
         dispatch_command(shell_program, ast->right);// 递归调度右子树
@@ -133,6 +148,7 @@ void dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
 	close(fd[0]);
     while (waitpid(-1, NULL, 0) > 0)
         ;
+    //free_all(shell_program);
     shell_program->exit_status = 0;
 }
 
@@ -143,8 +159,14 @@ void dispatch_command(t_shell *shell_program, ASTnode *ast)
     if (!ast)
         shell_program->exit_status = 0;
     if (ast->type == CMD)
+    {
         dispatch_simple_command(shell_program, ast);
+        return ;
+    }
     else if (ast->type == PIPE)
+    {
         dispatch_pipeline(shell_program, ast);
+        return ;
+    }
     shell_program->exit_status = 0;
 }

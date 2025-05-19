@@ -32,25 +32,21 @@ void start_heredoc(const char *delimiter)
             close(pipefd[1]);
             return;
         }
-
         line = readline("> ");
         if (!line)  // Si EOF (Ctrl+D) est reçu
         {
             write(1, "EOF reçu (Ctrl+D)\n", 18);
             break;
         }
-
         if (strcmp(line, delimiter) == 0)
         {
             free(line);
             break;
         }
-
         write(pipefd[1], line, strlen(line));
         write(pipefd[1], "\n", 1);
         free(line);
     }
-
     close(pipefd[1]);
     dup2(pipefd[0], STDIN_FILENO);//Dupliquer le pipe dans l'entrée standard
     close(pipefd[0]);
