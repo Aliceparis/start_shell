@@ -125,9 +125,10 @@ void    ft_token(char   *line, t_shell *shell_program)
     if (!is_quote_close(line))
     {
         /////fonction de quite et free, (error : error syntax)??????
-		error_message(shell_program, "Error: unmatched quote found in input.\n", 1);
-		free_all(shell_program);	
-		exit(1);
+		error_message(shell_program, "Error: unmatched quote found in input.", 1);
+		free_token(&(shell_program->token_list));
+        reset_terminal();
+        return ;	
     }
     while (*line)
     {
@@ -172,12 +173,12 @@ void update_token_value(token_type type, char *value, t_token **token_list)
     new->value = clean_old_content(ft_strdup(value), false);
     new->next = NULL;
     if (!*token_list)
-        *token_list = new;
+        *token_list = clean_old_content(new, false);
     else
     {
         tmp = *token_list;
 		while (tmp->next)
 			tmp = tmp->next;
-        tmp->next = new;
+        tmp->next = clean_old_content(new, false);
 	}
 }

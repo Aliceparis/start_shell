@@ -27,13 +27,15 @@ void    init_shell(t_shell *shell_program, char **env)
 	shell_program->token_list = NULL;
 	shell_program->ast = NULL;
 	init_envlist(shell_program);
-	shell_program->stdin = dup(0);
-    shell_program->stdout = dup(1);
+	shell_program->stdin = dup(STDIN_FILENO);
+    shell_program->stdout = dup(STDOUT_FILENO);
     tcgetattr(STDIN_FILENO, &shell_program->oldt);
 }
 
 void reset_terminal(void)
 {
+	rl_catch_signals = 0;
+    rl_catch_sigwinch = 0;
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // 恢复原始设置
 }
 void	ft_init_signals(t_shell *shell_program)
@@ -53,8 +55,8 @@ int main(int ac, char **av, char **envp)
 {
 	t_shell	shell_program;
 
-	rl_catch_signals = 0;
-    rl_catch_sigwinch = 0;
+	//rl_catch_signals = 0;
+    //rl_catch_sigwinch = 0;
     ((void)ac, (void)av);
     init_shell(&shell_program, envp);
     while (1)
@@ -71,14 +73,16 @@ int main(int ac, char **av, char **envp)
 			ft_expand_ast(shell_program.ast);
 			dispatch_command(&shell_program, shell_program.ast);
 		}
+		/*
 		free_token(&(shell_program.token_list));
 		shell_program.token_list = NULL;
 		free_ast(&shell_program);
 		shell_program.ast = NULL;
-		free(shell_program.line);
+		free(shell_program.line);*/
+		free_all(&shell_program);
     }
 // 恢复终端设置
     reset_terminal();
-	free_all(&shell_program);
+	//free_all(&shell_program);
     return 0;
 }

@@ -92,12 +92,10 @@ void free_envlist(t_env *env)
 void	free_all(t_shell *shell_program)
 {
 	clean_old_content(NULL, true);
-	printf("free1\n");
 	free_token(&(shell_program->token_list));
 	shell_program->token_list = NULL;
 	if (shell_program)
 	{
-		printf("free2\n");
 		free_ast(shell_program);
 		shell_program->ast = NULL;
 	}
@@ -111,6 +109,10 @@ void	free_all(t_shell *shell_program)
 		free(shell_program->line);
 		shell_program->line = NULL;
 	}
+	if (shell_program->stdin)
+		close(shell_program->stdin);
+	if (shell_program->stdout)
+		close(shell_program->stdout);
 	rl_clear_history();
 	tcsetattr(STDIN_FILENO, TCSANOW, &shell_program->oldt);
 	//if (shell_program)
