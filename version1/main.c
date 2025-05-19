@@ -80,6 +80,7 @@ int main(int ac, char **av, char **envp)
 		shell_program.ast = NULL;
 		free(shell_program.line);*/
 		free_all(&shell_program);
+		print_ast_debug(shell_program.ast, 0);
     }
 // 恢复终端设置
     reset_terminal();

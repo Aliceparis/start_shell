@@ -90,14 +90,12 @@ void dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
     if (is_builtin(ast->args[0]))
     {
         excute_builtin(shell_program, ast->args);
-        //free_all(shell_program);
         return ;
     }
     pid = fork();
     if (pid == 0)
     {
         execute(ast->args, shell_program->environ, shell_program);
-        free_all(shell_program);
         shell_program->exit_status = 0;
     }
     else if (pid > 0)
@@ -127,28 +125,27 @@ void dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
         error_message(shell_program, "pipe error", 1);
     if (fork() == 0)
     {
-        printf("pipe 2\n");
         dup2(fd[1], STDOUT_FILENO);
         close(fd[0]);
 		close(fd[1]);
         dispatch_command(shell_program, ast->left);// 递归调度左子树
-        //free_all(shell_program);
+        free_all(shell_program);
         exit(shell_program->exit_status);
     }
     if (fork() == 0)
     {
-        printf("pipe 1\n");
         dup2(fd[0], STDIN_FILENO);
         close(fd[1]);
+        close(fd[0]);
         dispatch_command(shell_program, ast->right);// 递归调度右子树
+        free_all(shell_program);
         exit(shell_program->exit_status);
     }
     close(fd[0]);
     close(fd[1]);
-	close(fd[0]);
+	//close(fd[0]);
     while (waitpid(-1, NULL, 0) > 0)
         ;
-    //free_all(shell_program);
     shell_program->exit_status = 0;
 }
 

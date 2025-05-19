@@ -74,6 +74,7 @@ void	free_cmd_node(ASTnode *node)
 			i++;
 		}
 		free(node->args);
+		node->args = NULL;
 	}
 }
 void free_envlist(t_env *env)

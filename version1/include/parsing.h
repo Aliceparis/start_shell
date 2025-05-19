@@ -43,4 +43,6 @@ char	*content_with_variable(char *str, int *i, t_shell *shell_program);
 char	*content_simple(char *str, int *i);
 char	*joint_and_free(char *s1, char *s2);
 
+void	print_ast_debug(ASTnode *node, int depth);
+
 #endif

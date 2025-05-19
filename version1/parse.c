@@ -131,3 +131,12 @@ void print_ast(ASTnode *node, int depth)
     print_ast(node->left, depth + 1);
     print_ast(node->right, depth + 1);
 }
+void	print_ast_debug(ASTnode *node, int depth)
+{
+	if (!node)
+		return;
+	printf("[DEPTH %d] node: %p | left: %p | right: %p\n",
+		depth, (void *)node, (void *)node->left, (void *)node->right);
+	print_ast_debug(node->left, depth + 1);
+	print_ast_debug(node->right, depth + 1);
+}
