@@ -168,24 +168,11 @@ void dispatch_command(t_shell *shell_program, ASTnode *ast)
         dispatch_pipeline(shell_program, ast);
     else if(ast->r_type == HEREDOC)
     {
-        printf("je suis rentre dans heredoc\n");
         start_heredoc(ast->delimiter);
         dispatch_command(shell_program, ast->left);
     }
     else if (ast->type == REDIRECTION)
-    {
-        /*if (ast->r_type == HEREDOC)
-        {
-            printf("je suis rentre dans heredoc\n");
-            start_heredoc(ast->delimiter);
-            dispatch_command(shell_program, ast->left);
-        }
-        else{
-            printf("redirection\n");
-            handle_redirection(shell_program, ast);}*/
-        handle_redirection(shell_program,ast);
-    }
-        
+        handle_redirection(shell_program,ast); 
     shell_program->exit_status = 0;
 }
 

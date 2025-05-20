@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exit.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yujin <yujin@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/19 14:29:09 by yujin             #+#    #+#             */
+/*   Updated: 2025/05/20 13:17:10 by yujin            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "libft.h"
 #include "minishell.h"
 #include <stdio.h>
@@ -12,7 +24,7 @@ int ft_exit(t_shell *shell_program, char **args)
     if (args[1] && args[2])
     {
         error_message(shell_program, "exit: too many arguments", 1);
-		printf("exit 1 !\n");
+		printf("exit 1!\n");
         return (1);
     }
     else if (args[1])
@@ -27,7 +39,7 @@ int ft_exit(t_shell *shell_program, char **args)
             i++;
         }
         shell_program->exit_status = (unsigned char)(ft_atoi(args[1]));
-		free_all(shell_program);
+		//free_all(shell_program);
         exit(shell_program->exit_status);
     }
     else if(args[1])
@@ -36,11 +48,8 @@ int ft_exit(t_shell *shell_program, char **args)
 	{
         shell_program->exit_status = 0;
 	}
-	free_token(&(shell_program->token_list));
 	shell_program->token_list = NULL;
-	free_ast(shell_program);
 	shell_program->ast = NULL;
-	free_envlist(shell_program->envlist);
 	shell_program->envlist = NULL;
     exit(0);
 }
