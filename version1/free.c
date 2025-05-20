@@ -14,7 +14,7 @@ void free_token(t_token **list)
     }
 }
 
-/*void free_ast(ASTnode *node)
+void free_ast(ASTnode *node)
 {
     int i;
 
@@ -37,8 +37,8 @@ void free_token(t_token **list)
 	if (node->operator)
     	free(node->operator);
     free(node);
-}*/
-void free_ast(t_shell *shell_program)
+}
+/*void free_ast(t_shell *shell_program)
 {
 	ASTnode	*node;
 
@@ -60,7 +60,7 @@ void free_ast(t_shell *shell_program)
 	}
 	free(node);
 	free_token(&(shell_program->token_list));
-}
+}*/
 void	free_cmd_node(ASTnode *node)
 {
 	int	i;
@@ -97,7 +97,7 @@ void	free_all(t_shell *shell_program)
 	shell_program->token_list = NULL;
 	if (shell_program)
 	{
-		free_ast(shell_program);
+		free_ast(shell_program->ast);
 		shell_program->ast = NULL;
 	}
 	if (shell_program->envlist)

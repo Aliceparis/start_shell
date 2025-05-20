@@ -28,6 +28,9 @@ ASTnode	*ft_parse(t_token **token, t_shell *shell_program)
 			node->left = left;
 			node->type = PIPE;
 			node->right = ft_parse(token, shell_program);
+			node->file = NULL;
+			node->args = NULL;
+			node->operator = NULL;
 			left = node;
 		}
 		else if ((*token)->type == REDICT_OUT || (*token)->type == REDICT_IN || (*token)->type == IS_HEREDOC || (*token)->type == REDICT_APPEND)
@@ -52,6 +55,7 @@ ASTnode	*ft_parse(t_token **token, t_shell *shell_program)
 			node->left = left;
 			node->right = ft_parse(token, shell_program);
 			left = clean_old_content(node, false);
+			node->args = NULL;
 		}
 		else
 			break ;
