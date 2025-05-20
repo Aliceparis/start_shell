@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   expansion.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yujin <yujin@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/19 14:29:12 by yujin             #+#    #+#             */
+/*   Updated: 2025/05/20 10:53:05 by yujin            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 /*!!!!!!expand_comande + ft_expand_ast non test*/
@@ -7,10 +19,10 @@ void	ft_expand_ast(ASTnode *node)
 	////fonction error and free (error : )
 	if (node->file)
 		expand_word(node->file);
+	if (node->r_type == HEREDOC && node->delimiter)
+		expand_word(node->delimiter);
 	if (node->type == CMD)
-	{
 		expande_commande(node);
-	}
 	else if (node->type == PIPE)
 	{
 		ft_expand_ast(node->left);

@@ -67,13 +67,13 @@ static void	execute(char **cmd, char **envp, t_shell *shell_program)
 	path = find_path(cmd[0], envp);
 	if (!path)
 	{
-		free_array(cmd);
+		free_all(shell_program);
 		shell_program->exit_status = 1;
 		error_commande("command not found", 127);
 	}
 	if (execve(path, cmd, envp) == -1)
     {
-        free_array(cmd);
+        free_all(shell_program);
         shell_program->exit_status = 1;
 		error_commande("Execution failed", 126);
     }
@@ -166,16 +166,25 @@ void dispatch_command(t_shell *shell_program, ASTnode *ast)
         dispatch_simple_command(shell_program, ast);
     else if (ast->type == PIPE)
         dispatch_pipeline(shell_program, ast);
+    else if(ast->r_type == HEREDOC)
+    {
+        printf("je suis rentre dans heredoc\n");
+        start_heredoc(ast->delimiter);
+        dispatch_command(shell_program, ast->left);
+    }
     else if (ast->type == REDIRECTION)
     {
-        if (ast->r_type == HEREDOC)
+        /*if (ast->r_type == HEREDOC)
         {
+            printf("je suis rentre dans heredoc\n");
             start_heredoc(ast->delimiter);
             dispatch_command(shell_program, ast->left);
         }
-        else
-            handle_redirection(shell_program, ast);
-        }
+        else{
+            printf("redirection\n");
+            handle_redirection(shell_program, ast);}*/
+        handle_redirection(shell_program,ast);
+    }
         
     shell_program->exit_status = 0;
 }
@@ -185,6 +194,7 @@ void handle_redirection(t_shell *shell_program, ASTnode *ast)
 {
 	int fd;
 
+    printf("ast :r_type = %u\n",ast->r_type);
 	if (!ast || ast->type != REDIRECTION)
 		return;
 
@@ -212,7 +222,5 @@ void handle_redirection(t_shell *shell_program, ASTnode *ast)
 		dup2(fd, STDIN_FILENO);
 		close(fd);
 	}
-
-	// Ensuite, exécuter la commande à gauche de la redirection
 	dispatch_command(shell_program, ast->left);
 }

@@ -4,11 +4,12 @@
 #include <signal.h>
 #include <string.h>
 #include <readline/readline.h>
+#include "include/minishell.h"
 
 volatile sig_atomic_t g_heredoc_interrupted = 0;
 
 // Gestion de SIGINT (Ctrl+C)
-void sigint_handler(int sig)
+static void sigint_handler(int sig)
 {
     (void)sig;
     g_heredoc_interrupted = 1;
@@ -20,9 +21,12 @@ void start_heredoc(const char *delimiter)
 {
     char *line;
     int pipefd[2];
-    pipe(pipefd);
 
+    g_heredoc_interrupted = 0;
     signal(SIGINT, sigint_handler);
+
+    if (pipe(pipefd) == -1)
+        return ;
 
     while (1)
     {
@@ -30,15 +34,12 @@ void start_heredoc(const char *delimiter)
         {
             close(pipefd[0]);
             close(pipefd[1]);
-            return;
+            return ;
         }
         line = readline("> ");
-        if (!line)  // Si EOF (Ctrl+D) est reçu
-        {
-            write(1, "EOF reçu (Ctrl+D)\n", 18);
+        if (!line)
             break;
-        }
-        if (strcmp(line, delimiter) == 0)
+        if (ft_strcmp(line, delimiter) == 0)
         {
             free(line);
             break;
@@ -49,8 +50,7 @@ void start_heredoc(const char *delimiter)
     }
 
     close(pipefd[1]);
-    dup2(pipefd[0], STDIN_FILENO);//Dupliquer le pipe dans l'entrée standard
-    close(pipefd[0]);
-    printf("heredoc terminé\n");
+    return (reset_terminal());
 }
+
 

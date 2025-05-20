@@ -30,33 +30,35 @@ ASTnode	*ft_parse(t_token **token, t_shell *shell_program)
 			node->right = ft_parse(token, shell_program);
 			left = node;
 		}
-		else if ((*token)->type == REDICT_OUT || (*token)->type == REDICT_IN || (*token)->type == IS_HEREDOC || (*token)->type == REDICT_APPEND)
+		else if ((*token)->type == REDICT_OUT ||(*token)->type == IS_HEREDOC || (*token)->type == REDICT_IN || (*token)->type == REDICT_APPEND)
 		{
 			node = malloc(sizeof(ASTnode));
 			if (!node)
-		////fonction error and free (error: malloc echoue)
 			{
 				error_message(shell_program, "Error: Malloc Astnode failed.\n", 1);
 				free_all(shell_program);
 			}
 			node->operator = (*token)->value;
+			if ((*token)->type == IS_HEREDOC)
+				node->r_type = HEREDOC;
 			*token = (*token)->next;
+			node->delimiter = ft_strdup((*token)->value);
 			if (!(*token) && (*token)->type != IS_WORD)
 			{
 				error_message(shell_program, "Error: token est null.\n", 1);
 				free_all(shell_program);
 			}
-			node->file = clean_old_content(ft_strdup((*token)->value), false);
-			/*if (node->r_type == HEREDOC)
-				node->delimiter = ft_strdup((*token)->value);
-			else
-				node->file = clean_old_content(ft_strdup((*token)->value), false);*/ // Avoir le deimiter de cat << delimter
-			*token = (*token)->next;
 			node->type = REDIRECTION;
+			node->file = clean_old_content(ft_strdup((*token)->value), false); // Avoir le deimiter de cat << delimter
+			*token = (*token)->next;
 			node->left = left;
 			node->right = ft_parse(token, shell_program);
 			left = node;
 		}
+		/*else if ((*token)->type == IS_HEREDOC)
+		{
+
+		}*/
 		else
 			break ;
 	}
@@ -108,6 +110,7 @@ ASTnode	*simple_commande(t_token **token, t_shell *shell_program)
 	node->left = node->right =  NULL;
 	return (node);
 }
+
 void print_ast(ASTnode *node, int depth)
 {
     if (!node)
