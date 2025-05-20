@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <fcntl.h>
+
+void handle_redirection(t_shell *shell_program, ASTnode *ast);
+
 
 /*PIPEX FONCTION FILE: utils.c*/
 void	free_array(char **arr)
@@ -58,20 +62,19 @@ static void	execute(char **cmd, char **envp, t_shell *shell_program)
 {
 	char	*path;
 
-    (void)shell_program;
 	if (!cmd)
 		error_commande("command split failed", 1);
 	path = find_path(cmd[0], envp);
 	if (!path)
 	{
-		//free_array(cmd);
 		free_all(shell_program);
+		shell_program->exit_status = 1;
 		error_commande("command not found", 127);
 	}
 	if (execve(path, cmd, envp) == -1)
     {
-        //free_array(cmd);
         free_all(shell_program);
+        shell_program->exit_status = 1;
 		error_commande("Execution failed", 126);
     }
 }
@@ -118,12 +121,16 @@ void dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
 void dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
 {
     int fd[2];
+    pid_t pid1, pid2;
 
-    if (!ast || ast->type != PIPE)
+    if (!ast || ast->type != PIPE){
         shell_program->exit_status = 1;
+        return ;
+    }
     if (pipe(fd) == -1)
         error_message(shell_program, "pipe error", 1);
-    if (fork() == 0)
+    pid1 = fork();
+    if (pid1 == 0)
     {
         dup2(fd[1], STDOUT_FILENO);
         close(fd[0]);
@@ -131,17 +138,16 @@ void dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
         dispatch_command(shell_program, ast->left);// 递归调度左子树
         exit(shell_program->exit_status);
     }
-    if (fork() == 0)
+    pid2 = fork();
+    if (pid2 == 0)
     {
         dup2(fd[0], STDIN_FILENO);
         close(fd[1]);
-        close(fd[0]);
         dispatch_command(shell_program, ast->right);// 递归调度右子树
         exit(shell_program->exit_status);
     }
     close(fd[0]);
     close(fd[1]);
-	//close(fd[0]);
     while (waitpid(-1, NULL, 0) > 0)
         ;
     shell_program->exit_status = 0;
@@ -152,18 +158,66 @@ void dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
 void dispatch_command(t_shell *shell_program, ASTnode *ast)
 {
     if (!ast)
+    {
         shell_program->exit_status = 0;
+        return ;
+    }
     if (ast->type == CMD)
     {
         dispatch_simple_command(shell_program, ast);
         free_all(shell_program);
-        return ;
     }
     else if (ast->type == PIPE)
     {
         dispatch_pipeline(shell_program, ast);
         free_all(shell_program);
-        return ;
     }
+    else if(ast->r_type == HEREDOC)
+    {
+        start_heredoc(ast->delimiter);
+        dispatch_command(shell_program, ast->left);
+        free_all(shell_program);
+    }
+    else if (ast->type == REDIRECTION)
+    {
+        handle_redirection(shell_program,ast);
+        free_all(shell_program);
+    }
+        
     shell_program->exit_status = 0;
+}
+
+
+void handle_redirection(t_shell *shell_program, ASTnode *ast)
+{
+	int fd;
+
+	if (!ast || ast->type != REDIRECTION)
+		return;
+
+	if (ast->r_type == OUT)
+	{
+		fd = open(ast->file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (fd < 0)
+			return (error_message(shell_program, "Redirection OUT: ouverture échouée\n", 1));
+		dup2(fd, STDOUT_FILENO);
+		close(fd);
+	}
+	else if (ast->r_type == APPEND)
+	{
+		fd = open(ast->file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		if (fd < 0)
+			return (error_message(shell_program, "Redirection APPEND: ouverture échouée\n", 1));
+		dup2(fd, STDOUT_FILENO);
+		close(fd);
+	}
+	else if (ast->r_type == IN)
+	{
+		fd = open(ast->file, O_RDONLY);
+		if (fd < 0)
+			return (error_message(shell_program, "Redirection IN: fichier introuvable\n", 1));
+		dup2(fd, STDIN_FILENO);
+		close(fd);
+	}
+	dispatch_command(shell_program, ast->left);
 }

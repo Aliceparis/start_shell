@@ -18,6 +18,7 @@ static void	ft_sigint_handler(int num)
 		rl_replace_line("", 0);
 		rl_on_new_line();
 		rl_redisplay();
+		close(0);
 	}
 }
 void    init_shell(t_shell *shell_program, char **env)
@@ -80,7 +81,7 @@ int main(int ac, char **av, char **envp)
 		shell_program.ast = NULL;
 		free(shell_program.line);*/
 		free_all(&shell_program);
-		print_ast_debug(shell_program.ast, 0);
+		//print_ast_debug(shell_program.ast, 0);
     }
 // 恢复终端设置
     reset_terminal();

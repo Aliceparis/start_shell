@@ -7,10 +7,10 @@ void	ft_expand_ast(ASTnode *node, t_shell *shell_program)
 	////fonction error and free (error : )
 	if (node->file)
 		expand_word(node->file, shell_program);
+	//if (node->r_type == HEREDOC && node->delimiter)
+		//expand_word(node->delimiter, shell_program);
 	if (node->type == CMD)
-	{
 		expande_commande(node, shell_program);
-	}
 	else if (node->type == PIPE)
 	{
 		ft_expand_ast(node->left, shell_program);

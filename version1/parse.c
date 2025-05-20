@@ -31,32 +31,39 @@ ASTnode	*ft_parse(t_token **token, t_shell *shell_program)
 			node->file = NULL;
 			node->args = NULL;
 			node->operator = NULL;
+			node->delimiter = NULL;
 			left = node;
 		}
-		else if ((*token)->type == REDICT_OUT || (*token)->type == REDICT_IN || (*token)->type == IS_HEREDOC || (*token)->type == REDICT_APPEND)
+		else if ((*token)->type == REDICT_OUT ||(*token)->type == IS_HEREDOC || (*token)->type == REDICT_IN || (*token)->type == REDICT_APPEND)
 		{
 			node = malloc(sizeof(ASTnode));
 			if (!node)
-		////fonction error and free (error: malloc echoue)
 			{
 				error_message(shell_program, "Error: Malloc Astnode failed.\n", 1);
 				free_all(shell_program);
 			}
 			node->operator = (*token)->value;
+			if ((*token)->type == IS_HEREDOC)
+				node->r_type = HEREDOC;
 			*token = (*token)->next;
+			node->delimiter = clean_old_content(ft_strdup((*token)->value), false);
 			if (!(*token) && (*token)->type != IS_WORD)
 			{
 				error_message(shell_program, "Error: token est null.\n", 1);
 				free_all(shell_program);
 			}
-			node->file = clean_old_content(ft_strdup((*token)->value), false);
-			*token = (*token)->next;
 			node->type = REDIRECTION;
+			node->file = ft_strdup((*token)->value); // Avoir le deimiter de cat << delimter
+			*token = (*token)->next;
 			node->left = left;
 			node->right = ft_parse(token, shell_program);
-			left = clean_old_content(node, false);
+			left = node;
 			node->args = NULL;
 		}
+		/*else if ((*token)->type == IS_HEREDOC)
+		{
+
+		}*/
 		else
 			break ;
 	}
@@ -91,7 +98,7 @@ ASTnode	*simple_commande(t_token **token, t_shell *shell_program)
 	}
 	while (*token && (*token)->type == IS_WORD)
 	{
-		args[i++] =clean_old_content(ft_strdup((*token)->value), false);
+		args[i++] = clean_old_content(ft_strdup((*token)->value), false);
 		*token = (*token)->next;
 	}
 	args[i] = NULL;
@@ -108,6 +115,7 @@ ASTnode	*simple_commande(t_token **token, t_shell *shell_program)
 	node->left = node->right =  NULL;
 	return (node);
 }
+
 void print_ast(ASTnode *node, int depth)
 {
     if (!node)
@@ -134,13 +142,4 @@ void print_ast(ASTnode *node, int depth)
 
     print_ast(node->left, depth + 1);
     print_ast(node->right, depth + 1);
-}
-void	print_ast_debug(ASTnode *node, int depth)
-{
-	if (!node)
-		return;
-	printf("[DEPTH %d] node: %p | left: %p | right: %p\n",
-		depth, (void *)node, (void *)node->left, (void *)node->right);
-	print_ast_debug(node->left, depth + 1);
-	print_ast_debug(node->right, depth + 1);
 }

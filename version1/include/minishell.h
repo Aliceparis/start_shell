@@ -12,6 +12,7 @@
 # include <termios.h>
 # include <signal.h>
 # include <stdbool.h>
+# include <sys/wait.h>
 
 # include <readline/history.h>
 # include <readline/readline.h>
@@ -108,7 +109,7 @@ void	free_cmd_node(ASTnode *node);
 //void free_ast(t_shell *shell_program);
 
 /*********************************herdoc.c*********************/
-void sigint_handler(int sig);
+//void sigint_handler(int sig);
 void start_heredoc(const char *delimiter);
 
 void print_ast(ASTnode *node, int depth);
