@@ -97,11 +97,11 @@ void	free_all(t_shell *shell_program)
 		free_token(&(shell_program->token_list));
 		shell_program->token_list = NULL;
 	}
-	if (shell_program)
+	/*if (shell_program)
 	{
 		free_ast(shell_program);
 		shell_program->ast = NULL;
-	}
+	}*/
 	if (shell_program->envlist)
 	{
 		free_envlist(shell_program->envlist);
