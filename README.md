@@ -19,14 +19,4 @@ Ajout dossier de pipex
 3. free ast有问题
 6. $?值返回的设置在expansion那一部分还没有加进去
 
-
-
-**ft_fprintf OK**
-
-
-**Les commades qui marche**:
-- echo
-- exit
-- pwd
-- env
-- ls
+**tout ok mais pb de free et norm**
