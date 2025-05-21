@@ -7,7 +7,7 @@ static void sigint_handler(int sig)
 {
     (void)sig;
     g_heredoc_interrupted = 1;
-    write(1, "heredoc interrupted\n", 21);
+    write(1, "^C\n", 3);
     rl_done = 1;
 }
 
@@ -17,13 +17,15 @@ void heredoc_loop(const char *delimiter, int write_fd)
 
     while (1)
     {
-        if (g_heredoc_interrupted)
+        if (g_heredoc_interrupted == 1)
+        {
+            close(write_fd);
             exit(130); // code pour signal INT
+        }
         line = readline("> ");
         if (!line)
             break;
-
-        if (strcmp(line, delimiter) == 0)
+        if (ft_strcmp(line, delimiter) == 0)
         {
             free(line);
             break;
@@ -61,10 +63,11 @@ void start_heredoc(const char *delimiter)
     {
         close(pipefd[1]);
         waitpid(pid, &status, 0);
-        if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
+        if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
         {
-            g_heredoc_interrupted = 1;
+            g_heredoc_interrupted = 0;
             close(pipefd[0]);
+            reset_terminal();
             return ;
         }
         while ((bytes_read = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0)
