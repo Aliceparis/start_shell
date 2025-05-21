@@ -7,7 +7,7 @@ static void sigint_handler(int sig)
 {
     (void)sig;
     g_heredoc_interrupted = 1;
-    write(1, "^C\n", 3);
+    //write(1, "^C\n", 3);
     rl_done = 1;
 }
 

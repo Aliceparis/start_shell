@@ -67,13 +67,11 @@ static void	execute(char **cmd, char **envp, t_shell *shell_program)
 	path = find_path(cmd[0], envp);
 	if (!path)
 	{
-		free_all(shell_program);
 		shell_program->exit_status = 1;
 		error_commande("command not found", 127);
 	}
 	if (execve(path, cmd, envp) == -1)
     {
-        free_all(shell_program);
         shell_program->exit_status = 1;
 		error_commande("Execution failed", 126);
     }
