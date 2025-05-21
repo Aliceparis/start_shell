@@ -169,7 +169,8 @@ void dispatch_command(t_shell *shell_program, ASTnode *ast)
     else if(ast->r_type == HEREDOC)
     {
         start_heredoc(ast->delimiter);
-        dispatch_command(shell_program, ast->left);
+        if (g_heredoc_interrupted != 1)
+            dispatch_command(shell_program, ast->left);
     }
     else if (ast->type == REDIRECTION)
         handle_redirection(shell_program,ast); 
@@ -181,7 +182,6 @@ void handle_redirection(t_shell *shell_program, ASTnode *ast)
 {
 	int fd;
 
-    printf("ast :r_type = %u\n",ast->r_type);
 	if (!ast || ast->type != REDIRECTION)
 		return;
 
