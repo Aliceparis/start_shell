@@ -25,3 +25,10 @@ Ajout dossier de pipex
 **tout ok mais pb de free et norm**
 cat main.c | cat ok
 ls | grep.c ok 
+
+
+新问题： 
+我们的path删了 env还能用 但是bash里面是不能用的 我们是否让env用不了如果我们把path删了。其他的话我更新了一下environ cat ls 当path删了 现在就不能用了 跟bash是一样的。 
+在main里加了if (!shell_program.ast-＞left) 
+Dispatch 就用不了了
+比如我们写 echo ishs＞out 这个out的fichier就没有创造
