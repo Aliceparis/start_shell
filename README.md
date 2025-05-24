@@ -34,6 +34,7 @@ ls | grep.c ok
 比如我们写 echo ishs＞out 这个out的fichier就没有创造
 
 - CRTL + C
+
 Minishell> cat | cat | cat
 cs
 cs
