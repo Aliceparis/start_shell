@@ -33,6 +33,22 @@ ls | grep.c ok
 - 在main里加了if (!shell_program.ast-＞left)  Dispatch 就用不了了
 比如我们写 echo ishs＞out 这个out的fichier就没有创造
 
+- CRTL + C
+Minishell> cat | cat | cat
+cs
+cs
+加了  CRTL + C
+Minishell> 
+
+Minishell> Minishell> Minishell> 
+
+bash是
+bash-5.1$ cat | cat | cat
+sc
+sc
+^C
+bash-5.1$ 
+
 
 已解决的问题
 - exit_status ok 因为我们init 0 然后在每个fonction最后又加了exit_status=0 所以他显示的一直是0 需要将所有的fonction试试.
