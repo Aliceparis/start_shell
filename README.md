@@ -50,6 +50,16 @@ sc
 ^C
 bash-5.1$ 
 
+- Minishell> /bin/ls
+
+/bin/ls: cannot access '': No such file or directory
+Minishell> /bin/ls -l
+/bin/ls: cannot access '': No such file or directory
+Minishell>\n
+mais notre chemin absolue dans affcihe like ls les fichier......(test dans bash)
+
+
+
 
 已解决的问题
 - exit_status ok 因为我们init 0 然后在每个fonction最后又加了exit_status=0 所以他显示的一直是0 需要将所有的fonction试试.
