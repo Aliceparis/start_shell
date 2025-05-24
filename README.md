@@ -32,3 +32,6 @@ ls | grep.c ok
 
 在main里加了if (!shell_program.ast-＞left)  Dispatch 就用不了了
 比如我们写 echo ishs＞out 这个out的fichier就没有创造
+
+
+exit_status ok 因为我们init 0 然后在每个fonction最后又加了exit_status=0 所以他显示的一直是0 需要将所有的fonction试试.
