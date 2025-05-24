@@ -1,0 +1,3 @@
+**Compilation** : ok
+**Commande simple et variable global**: savoir pk utiliser un seul variable globale pour le signal. Sinon OK
+
