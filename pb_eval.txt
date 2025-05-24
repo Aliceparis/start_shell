@@ -1,3 +1,28 @@
-**Compilation** : ok
-**Commande simple et variable global**: savoir pk utiliser un seul variable globale pour le signal. Sinon OK
+Compilation : ok
+Commande simple et variable global: savoir pk utiliser un seul variable globale pour le signal + pb avec tab et \t il affiche une errreur
+Arguments : pb avec chemin absolu /bin/ls quand on fait 
+Echo :OK est ce besoin ajout de option -e??
+Exit: ok
+Valeur de retour d un processus: pb de chemin /bin/ls etc...
+Signaux: avec un pipe pb de CRTL + C il y a plusieurx minishelle qu is affiche 
+cat | cat | cat 
+cat: '': No such file or directory
+
+CRTL + C
+Minishell> Minishell> Minishell> 
+
+Double Quotes: OK
+Single Quote: OK
+Env:OK
+Export: OK
+Unset: OK
+cd :OK
+pwd: OK
+Chemin relatif: 
+PATH d environnememt: mettre plusieur rep a PATH et verifier si ils sont bien evaluee d gauche a droite.
+Redirection: OK
+Pipes:OK
+Soyons fou : ok mais sur cat | cat | ls meme pb que signaux
+Variables d environnement: OK
+
 
