@@ -59,6 +59,18 @@ Minishell>\n
 mais notre chemin absolue dans affcihe like ls les fichier......(test dans bash)
 
 
+echo $? 运行后，显示出了结果，第二次在运行时，返回值应该为0
+ctrlc 以后，echo $?值应该是130
+cat < 1 -e ,实际上就是cat -e < 1
+ls > text.txt ,head text.txt 显示错行
+export A=$A
+cd /home没问题，之后的echo $PWD没有更新path
+echo “hello” > text.txt > text2.txt text2没有creer，按理hello出现在2中，text.txt中没有内容
+在minishell中再次运行minishell出现了问题
+unset后面很么也不加出现了segmentation的问题
+unset fdear dear运行正确，exitstatus值为0,而非127
+unset A B 之山除掉A
+
 
 
 已解决的问题
