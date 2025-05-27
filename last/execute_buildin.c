@@ -19,7 +19,12 @@ void excute_builtin(t_shell *shell_program, char **args)
         ft_env(shell_program, shell_program->envlist);
     else if (ft_strcmp(args[0], "unset") == 0)
     {
-        shell_program->envlist = ft_unset(shell_program->envlist, args[1]);
+        i = 1;
+        while (args[i] != NULL)
+        {
+            shell_program->envlist = ft_unset(shell_program->envlist, args[i]);
+            i++;
+        }
         shell_program->environ = env_list_to_array(shell_program->envlist);
     }
     else if (ft_strcmp(args[0], "export") == 0)
