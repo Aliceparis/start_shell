@@ -5,6 +5,8 @@ t_env *ft_unset(t_env *env, const char *key)
     t_env *current = env;
     t_env *prev = NULL;
 
+    if (!env || !key)
+        return env;
     while (current)
     {
         if (ft_strcmp(current->key, key) == 0)
@@ -13,9 +15,6 @@ t_env *ft_unset(t_env *env, const char *key)
                 prev->next = current->next;
             else
                 env = current->next;
-            /*free(current->key);
-            free(current->value);
-            free(current);*/
             return (env);
         }
         prev = current;
