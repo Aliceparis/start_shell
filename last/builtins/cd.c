@@ -3,22 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yujin <yujin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: loulou <loulou@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 14:16:25 by yujin             #+#    #+#             */
-/*   Updated: 2025/05/24 15:36:10 by yujin            ###   ########.fr       */
+/*   Updated: 2025/05/27 15:10:18 by loulou           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	update_env(t_shell *shell_program, char *pre, char *new_dir)
+static void update_env(t_shell *shell_program, char *pre, char *new_dir) 
 {
-	shell_program->envlist = ft_export(shell_program->envlist, "OLDPWD", pre);
-	shell_program->envlist = ft_export(shell_program->envlist, "PWD", new_dir);
+    if (pre && pre[0] != '\0') {
+        shell_program->envlist = ft_export(shell_program->envlist, "OLDPWD", pre);
+        setenv("OLDPWD", pre, 1);
+    }
+    shell_program->envlist = ft_export(shell_program->envlist, "PWD", new_dir);
+    setenv("PWD", new_dir, 1);
 }
 
-// Fonction pour gérer le répertoire HOME
 static void	handle_home(t_shell *shell_program)
 {
 	char	*home;
@@ -85,8 +88,15 @@ void	ft_cd(t_shell *shell_program, char **args)
 	char		current_dir[BUFF];
 	const char	*pwd;
 
-	ft_memset(pre, 0, sizeof(pre));
-	pwd = getenv("PWD");
+
+	if (pre[0] == '\0')
+	{
+		pwd = getenv("PWD");
+		if (pwd)
+			ft_strncpy(pre, pwd, sizeof(pre));
+		else if (getcwd(pre, sizeof(pre)) == NULL)
+			pre[0] = '\0';
+	}
 	if (getcwd(current_dir, sizeof(current_dir)) == NULL)
 	{
 		if (pwd)
@@ -97,5 +107,6 @@ void	ft_cd(t_shell *shell_program, char **args)
 	process_cd_args(shell_program, args, pre);
 	if (shell_program->exit_status == 1)
 		return ;
-	ft_strncpy(pre, current_dir, sizeof(pre));
+	if (getcwd(current_dir, sizeof(current_dir)) != NULL)
+		ft_strncpy(pre, current_dir, sizeof(pre));
 }
