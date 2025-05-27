@@ -7,7 +7,7 @@
 #include <fcntl.h>
 
 void handle_redirection(t_shell *shell_program, ASTnode *ast);
-
+extern  volatile sig_atomic_t g_signal;
 
 /*PIPEX FONCTION FILE: utils.c*/
 void	free_array(char **arr)
@@ -84,7 +84,7 @@ static void	execute(char **cmd, char **envp, t_shell *shell_program)
 void dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
 {
     pid_t pid;
-    int status;
+    int status = 0;
 
     if (!ast || ast->type != CMD)
     {
@@ -96,15 +96,24 @@ void dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
         excute_builtin(shell_program, ast->args);
         return ;
     }
+    g_signal = PIPE;
     pid = fork();
     if (pid == 0)
     {
-        reset_signals_in_child();
+        signal(SIGINT, SIG_DFL);
+        signal(SIGQUIT, SIG_DFL);
         execute(ast->args, shell_program->environ, shell_program);
+        free_all(shell_program);
     }
     else if (pid > 0)
     {
         waitpid(pid, &status, 0);
+        /*while (waitpid(pid, &status, 0) == -1)
+        {
+            if (errno == EINTR)
+                continue;
+            break;
+        }*/
         if (WIFEXITED(status))
             shell_program->exit_status = WEXITSTATUS(status);
         else
@@ -138,7 +147,8 @@ static pid_t fork_and_execute_left(t_shell *shell_program, ASTnode *left, int *f
     }
     if (pid == 0)
     {
-        reset_signals_in_child();
+        signal(SIGINT, SIG_DFL);
+        signal(SIGQUIT, SIG_DFL);
         dup2(fd[1], STDOUT_FILENO);
         close_pipe_fds(fd);
         dispatch_command(shell_program, left);
@@ -160,7 +170,8 @@ static pid_t fork_and_execute_right(t_shell *shell_program, ASTnode *right, int 
     }
     if (pid == 0)
     {
-        reset_signals_in_child();
+        signal(SIGINT, SIG_DFL);
+        signal(SIGQUIT, SIG_DFL);
         dup2(fd[0], STDIN_FILENO);
         close_pipe_fds(fd);
         dispatch_command(shell_program, right);
@@ -175,15 +186,17 @@ void dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
     int fd[2];
     pid_t pid1;
     pid_t pid2;
-    int status1;
-    int status2;
+    int status1 = 0;
+    int status2 = 0;
 
+    g_signal = PIPE;
     if (!ast || ast->type != PIPE)
     {
         shell_program->exit_status = 1;
         return ;
     }
-    if (pipe(fd) == -1) {
+    if (pipe(fd) == -1) 
+    {
         error_message(shell_program, "pipe error", 1);
         shell_program->exit_status = 1;
         return ;
@@ -193,6 +206,7 @@ void dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
     {
         close_pipe_fds(fd);
         shell_program->exit_status = 1;
+        g_signal = NORMAL;
         return ;
     }
     pid2 = fork_and_execute_right(shell_program, ast->right, fd);
@@ -200,15 +214,30 @@ void dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
     {
         close_pipe_fds(fd);
         shell_program->exit_status = 1;
+        g_signal = NORMAL;
+
         return ;
     }
     close_pipe_fds(fd);
+    /*while (waitpid(pid2, &status2, 0) == -1)
+    {
+        if (errno == EINTR)
+            continue;
+        break;
+    }
+    while (waitpid(pid1, &status1, 0) == -1)
+    {
+        if (errno == EINTR)
+            continue;
+        break;
+    }*/
     waitpid(pid2, &status2, 0);
     waitpid(pid1, &status1, 0);
     if (WIFEXITED(status2))
         shell_program->exit_status = WEXITSTATUS(status2);
     else
         shell_program->exit_status = 1;
+    g_signal = 0;
 }
 
 /* séparer simple cmd:builtin et les restes exemple pipe*/
@@ -259,7 +288,11 @@ void handle_output_redirection(t_shell *shell_program, ASTnode *ast)
         return;
     }
     close(fd);
+     int old_signal = g_signal;
+    g_signal = PIPE;
     dispatch_command(shell_program, ast->left);
+    g_signal = old_signal;
+
     close_and_restore(saved_stdout, STDOUT_FILENO);
 }
 

@@ -1,7 +1,6 @@
 #include "include/minishell.h"
 
 volatile sig_atomic_t g_heredoc_interrupted = 0;
-
 // Gestion de SIGINT (Ctrl+C)
 /*static void sigint_handler(int sig)
 {
@@ -14,9 +13,10 @@ void heredoc_loop(const char *delimiter, int write_fd, t_shell *shell_program)
 {
     char *line;
 
+    g_signal = HEREDOC;
     while (1)
     {
-        if (g_heredoc_interrupted == 1)
+        if (g_signal == HEREDOC)
         {
             close(write_fd);
             free_all(shell_program);
@@ -25,7 +25,10 @@ void heredoc_loop(const char *delimiter, int write_fd, t_shell *shell_program)
         }
         line = readline("> ");
         if (!line)
+        {
+            g_signal = 0;
             break;
+        }
         if (ft_strcmp(line, delimiter) == 0)
         {
             free(line);
@@ -35,6 +38,7 @@ void heredoc_loop(const char *delimiter, int write_fd, t_shell *shell_program)
         write(write_fd, "\n", 1);
         free(line);
     }
+    g_signal = 0;
     close(write_fd);
     exit(0);
 }
@@ -55,7 +59,7 @@ void start_heredoc(const char *delimiter, t_shell *shell_program)
         return ;
     if (pid == 0)
     {
-        reset_signals_in_child() ; 
+        //reset_signals_in_child() ; 
         signal(SIGINT, handle_signal);// gérer Ctrl+C
         rl_catch_signals = 0;
         close(pipefd[0]); // l'enfant écrit

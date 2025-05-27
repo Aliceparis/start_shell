@@ -12,6 +12,7 @@
 # include <signal.h>
 # include <stdbool.h>
 # include <sys/wait.h>
+# include <errno.h>
 
 # include <readline/history.h>
 # include <readline/readline.h>
@@ -20,6 +21,9 @@
 #  define BUFF 1024
 # endif
 
+# define NORMAL 0
+# define HEREDOC 1
+# define PIPE 2
 typedef struct e_node ASTnode;
 
 typedef struct s_env
@@ -45,7 +49,8 @@ typedef struct s_shell
     bool signint_child;
 }t_shell;
 
-extern  int g_signal;
+extern  volatile sig_atomic_t g_signal;
+
 
 /*******************main.c********************/
 void    init_shell(t_shell *shell_program, char **env);
