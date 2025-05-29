@@ -13,8 +13,6 @@ typedef enum e_node_type
 	HEREDOC,
 }node_type;
 
-
-
 typedef struct e_node
 {
 	node_type	type;
@@ -39,7 +37,9 @@ char	*content_in_double_quote(char *str, int *i, t_shell *shell_program);
 char	*content_with_variable(char *str, int *i, t_shell *shell_program);
 char	*content_simple(char *str, int *i);
 char	*joint_and_free(char *s1, char *s2);
+char	*getenv_value(t_shell *shell_program, const char *var_name);
 
 void	print_ast_debug(ASTnode *node, int depth);
+void    init_tree(t_shell *shell_program, ASTnode *node);
 
 #endif

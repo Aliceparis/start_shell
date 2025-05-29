@@ -3,25 +3,21 @@
 /*!!!!!!expand_comande + ft_expand_ast non test*/
 void	ft_expand_ast(ASTnode *node, t_shell *shell_program)
 {
-	if (!node)
-	{
-		error_message(shell_program, "ast est nulle\n", 2);
-		reset_terminal(shell_program);
-	}
+	if (node->type == CMD)
+			expande_commande(node, shell_program);
 	else
 	{
-		if (node->type == CMD)
-			expande_commande(node, shell_program);
-		else if (node->type == PIPE)
-		{
 			ft_expand_ast(node->left, shell_program);
-			ft_expand_ast(node->right, shell_program);
-		}
-		else
-			ft_expand_ast(node->left, shell_program);
+			if (node->right)
+				ft_expand_ast(node->right, shell_program);
 	}
+	if (!node)
+	{
+		error_message(shell_program, "ast est nulle11111\n", 2);
+		reset_terminal(shell_program);
+	}
+	
 }
-
 void	expande_commande(ASTnode *node, t_shell *shell_program)
 {
 	char	*expanded;
@@ -110,7 +106,21 @@ char	*content_in_double_quote(char *str, int *i, t_shell *shell_program)
 		(*i)++;
 	return (resultat);
 }
+char	*getenv_value(t_shell *shell_program, const char *var_name)
+{
+	t_env	*envlist;
 
+	envlist = shell_program->envlist;
+	while (envlist)
+	{
+		if (ft_strcmp(envlist->key, var_name) == 0)
+		{
+			return (envlist->value);
+		}
+		envlist = envlist->next;
+	}
+	return (NULL);
+}
 char	*content_with_variable(char *str, int *i, t_shell *shell_program)
 {
 	int	start;
@@ -124,7 +134,6 @@ char	*content_with_variable(char *str, int *i, t_shell *shell_program)
 		*i += 2;
 		return (clean_old_content(ft_itoa(shell_program->exit_status), false));
 	}
-	//// fonction pour retourner la valeur de la derniere execution 
 	start = *i + 1;
 	resultat = clean_old_content(ft_strdup(""), false);
 	var_len = 0;
@@ -136,7 +145,7 @@ char	*content_with_variable(char *str, int *i, t_shell *shell_program)
 		return (ft_strdup("$"));
 	}
 	var_name = ft_substr(str, start, var_len);
-	tmp = getenv(var_name);
+	tmp = getenv_value(shell_program, var_name);
 	free(var_name);
 	if (tmp)
 		resultat = clean_old_content(ft_strjoin(resultat, tmp), false);

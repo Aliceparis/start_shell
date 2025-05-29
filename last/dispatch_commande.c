@@ -52,31 +52,28 @@ char	*find_path(char *cmd, char **envp)
 	return (free_array(paths), NULL);
 }
 
-void	error_commande(char *msg, int status)
-{
-	write(2, msg, ft_strlen(msg));
-	write(2, "\n", 1);
-	exit(status);
-}
 
 static void	execute(char **cmd, char **envp, t_shell *shell_program)
 {
 	char	*path;
 
 	if (!cmd)
-		error_commande("command split failed", 1);
+		error_message(shell_program, "command split failed", 1);
 	path = find_path(cmd[0], envp);
 	if (!path)
 	{
 		free_all(shell_program);
-		error_commande("command not found", 127);
-        shell_program->exit_status = 1;
+		error_message(shell_program, "command not found", 127);
 	}
 	if (execve(path, cmd, envp) == -1)
     {
         free_all(shell_program);
-        shell_program->exit_status = 1;
-		error_commande("Execution failed", 126);
+		error_message(shell_program, "Execution failed", 126);
+    }
+    if (g_signal == PIPE)
+    {
+        free_all(shell_program);
+        g_signal = NORMAL;
     }
 }
 
@@ -96,26 +93,31 @@ void dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
         excute_builtin(shell_program, ast->args);
         return ;
     }
-    g_signal = PIPE;
+    //g_signal = PIPE;
     pid = fork();
     if (pid == 0)
     {
         signal(SIGINT, SIG_DFL);
         signal(SIGQUIT, SIG_DFL);
         execute(ast->args, shell_program->environ, shell_program);
-        free_all(shell_program);
+        //free_all(shell_program);
+        exit(shell_program->exit_status);
     }
     else if (pid > 0)
     {
-        waitpid(pid, &status, 0);
-        /*while (waitpid(pid, &status, 0) == -1)
+        int wait_result = waitpid(pid, &status, 0);
+        
+        if (wait_result == -1)
         {
-            if (errno == EINTR)
-                continue;
-            break;
-        }*/
+            // waitpid 失败，可能是被信号中断
+            free_all(shell_program);
+            g_signal = NORMAL;
+            return;
+        }        
         if (WIFEXITED(status))
             shell_program->exit_status = WEXITSTATUS(status);
+        else if (WIFSIGNALED(status))
+            shell_program->exit_status = 128 + WTERMSIG(status);
         else
             shell_program->exit_status = 1;
     }
@@ -124,6 +126,8 @@ void dispatch_simple_command(t_shell *shell_program, ASTnode *ast)
 		error_message(shell_program, "fork error", 1);
         shell_program->exit_status = 1;
     }
+    //free_all(shell_program);
+    g_signal = NORMAL;
 }
 
 void close_pipe_fds(int fd[2])
@@ -152,7 +156,7 @@ static pid_t fork_and_execute_left(t_shell *shell_program, ASTnode *left, int *f
         dup2(fd[1], STDOUT_FILENO);
         close_pipe_fds(fd);
         dispatch_command(shell_program, left);
-        free_all(shell_program);
+        //free_all(shell_program);
         exit(shell_program->exit_status);
     }
     return (pid);
@@ -175,7 +179,7 @@ static pid_t fork_and_execute_right(t_shell *shell_program, ASTnode *right, int 
         dup2(fd[0], STDIN_FILENO);
         close_pipe_fds(fd);
         dispatch_command(shell_program, right);
-        free_all(shell_program);
+        //free_all(shell_program);
         exit(shell_program->exit_status);
     }
     return (pid);
@@ -231,13 +235,50 @@ void dispatch_pipeline(t_shell *shell_program, ASTnode *ast)
             continue;
         break;
     }*/
-    waitpid(pid2, &status2, 0);
+    /*waitpid(pid2, &status2, 0);
     waitpid(pid1, &status1, 0);
     if (WIFEXITED(status2))
+    {
+        //free_all(shell_program);
         shell_program->exit_status = WEXITSTATUS(status2);
+    }
     else
+    {
         shell_program->exit_status = 1;
-    g_signal = 0;
+    }
+    free_all(shell_program);
+    g_signal = NORMAL;*/
+    int wait_result1, wait_result2;
+    
+    wait_result2 = waitpid(pid2, &status2, 0);
+    wait_result1 = waitpid(pid1, &status1, 0);
+    
+    // 检查是否因为信号被中断
+    if (wait_result1 == -1 || wait_result2 == -1)
+    {
+        // 如果waitpid失败，可能是因为信号中断
+        // 确保清理资源
+        free_all(shell_program);
+        g_signal = NORMAL;
+        return;
+    }
+    
+    if (WIFEXITED(status2))
+    {
+        shell_program->exit_status = WEXITSTATUS(status2);
+    }
+    else if (WIFSIGNALED(status2))
+    {
+        // 如果子进程被信号终止
+        shell_program->exit_status = 128 + WTERMSIG(status2);
+    }
+    else
+    {
+        shell_program->exit_status = 1;
+    }
+    
+    //free_all(shell_program);
+    //g_signal = NORMAL;
 }
 
 /* séparer simple cmd:builtin et les restes exemple pipe*/
@@ -273,12 +314,16 @@ void handle_output_redirection(t_shell *shell_program, ASTnode *ast)
     int fd = open(ast->delimiter, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     int saved_stdout = dup(STDOUT_FILENO);
 
-    if (saved_stdout == -1 || fd < 0)
+    if (fd < 0)
     {
         error_message(shell_program, "Redirection OUT: ouverture échouée\n", 1);
-        if (saved_stdout != -1) close(saved_stdout);
-        if (fd != -1) close(fd);
         return;
+    }
+    if (saved_stdout < 0)
+    {
+        perror("dup failed");
+        close(fd);
+        return ;
     }
     if (dup2(fd, STDOUT_FILENO) == -1)
     {
@@ -288,11 +333,11 @@ void handle_output_redirection(t_shell *shell_program, ASTnode *ast)
         return;
     }
     close(fd);
-     int old_signal = g_signal;
+    /* int old_signal = g_signal;
     g_signal = PIPE;
     dispatch_command(shell_program, ast->left);
-    g_signal = old_signal;
-
+    g_signal = old_signal;*/
+    dispatch_command(shell_program, ast->left);
     close_and_restore(saved_stdout, STDOUT_FILENO);
 }
 
@@ -328,14 +373,17 @@ void handle_input_redirection(t_shell *shell_program, ASTnode *ast)
     int fd = open(ast->delimiter, O_RDONLY);
     int saved_stdin = dup(STDIN_FILENO);
 
-    if (saved_stdin == -1 || fd < 0)
+    if (fd < 0)
     {
         error_message(shell_program, "Redirection IN: fichier introuvable\n", 1);
-        if (saved_stdin != -1) close(saved_stdin);
-        if (fd != -1) close(fd);
         return;
     }
-
+    if (saved_stdin < 0)
+    {
+        perror("dup(STDIN_FILENO) failed");
+        close(fd);
+        return;
+    }
     if (dup2(fd, STDIN_FILENO) == -1)
     {
         perror("Erreur dup2 IN");
@@ -357,4 +405,19 @@ void handle_redirection(t_shell *shell_program, ASTnode *ast)
         handle_append_redirection(shell_program, ast);
     else if (ast->type == IN)
         handle_input_redirection(shell_program, ast);
+}
+void    init_tree(t_shell *shell_program, ASTnode *node)
+{
+    if (!node)
+        return ;
+    if (node->type != CMD)
+    {
+        init_tree(shell_program, node->left);
+        if (!shell_program->heredoc_sing)
+            init_tree(shell_program, node->right);
+    }
+    else
+    {
+        dispatch_command(shell_program, node);
+    }
 }

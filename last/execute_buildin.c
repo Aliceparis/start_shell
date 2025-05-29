@@ -19,12 +19,7 @@ void excute_builtin(t_shell *shell_program, char **args)
         ft_env(shell_program, shell_program->envlist);
     else if (ft_strcmp(args[0], "unset") == 0)
     {
-        i = 1;
-        while (args[i] != NULL)
-        {
-            shell_program->envlist = ft_unset(shell_program->envlist, args[i]);
-            i++;
-        }
+        shell_program->envlist = ft_unset(shell_program->envlist, args[1]);
         shell_program->environ = env_list_to_array(shell_program->envlist);
     }
     else if (ft_strcmp(args[0], "export") == 0)
@@ -34,28 +29,85 @@ void excute_builtin(t_shell *shell_program, char **args)
             i = 1;
             while (args[i])
             {
-                printf("ars dans export :%s\n", args[i]);
-                equal_sign = ft_strchr(args[i], '=');
-                if (equal_sign)
+                // 尝试合并 "A=" 和 "value" 的情况
+                if (ft_strchr(args[i], '=') && args[i + 1] && !ft_strchr(args[i + 1], '='))
+                {
+                    char *merged = ft_strjoin(args[i], args[i + 1]);
+                    equal_sign = ft_strchr(merged, '=');
+                    if (equal_sign)
+                    {
+                        *equal_sign = '\0';
+                        if (is_valid_env_var_name(merged))  // 检查变量名是否合法
+                        {
+                            shell_program->envlist = ft_export(shell_program->envlist, merged, equal_sign + 1);
+                            shell_program->environ = env_list_to_array(shell_program->envlist);
+                        }
+                        else
+                        {
+                            printf("minishell: export: `%s`: not a valid identifier\n", merged);
+                            shell_program->exit_status = 1;
+                        }
+                        *equal_sign = '=';
+                    }
+                    free(merged);
+                    i += 2;  // 跳过已处理的下一个参数
+                }
+                    // 处理普通 KEY=VALUE 格式
+                else if ((equal_sign = ft_strchr(args[i], '=')))
                 {
                     *equal_sign = '\0';
-                    shell_program->envlist = ft_export(shell_program->envlist, args[i], (equal_sign + 1));
+                    if (is_valid_env_var_name(args[i]))  // 检查变量名是否合法
+                    {
+                        shell_program->envlist = ft_export(shell_program->envlist, args[i], equal_sign + 1);
+                        shell_program->environ = env_list_to_array(shell_program->envlist);
+                    }
+                    else
+                    {
+                        printf("minishell: export: `%s`: not a valid identifier\n", args[i]);
+                         shell_program->exit_status = 1;
+                    }
                     *equal_sign = '=';
-                    shell_program->environ = env_list_to_array(shell_program->envlist);
+                    i++;
                 }
+    // 处理无等号的情况（如 export VAR）
                 else
                 {
-                    printf("minishell: export: invalid format\n");
-                    shell_program->exit_status = 1;
+                    if (is_valid_env_var_name(args[i]))
+                    {
+                        shell_program->envlist = ft_export(shell_program->envlist, args[i], NULL);
+                        shell_program->environ = env_list_to_array(shell_program->envlist);
+                    }
+                    else
+                    {
+                        printf("minishell: export: `%s`: not a valid identifier\n", args[i]);
+                        shell_program->exit_status = 1;
+                    }
+                    i++;
                 }
-                i++;
             }
         }
         else
             ft_env(shell_program, shell_program->envlist);
     }
 }
-
+int is_valid_env_var_name(const char *name)
+{
+    if (!name || !*name)
+        return 0;
+    
+    // 首字符必须是字母或下划线
+    if (!ft_isalpha(*name) && *name != '_')
+        return 0;
+    
+    // 后续字符可以是字母、数字或下划线
+    while (*++name)
+    {
+        if (!ft_isalnum(*name) && *name != '_')
+            return 0;
+    }
+    
+    return 1;
+}
 
 int is_builtin(char *cmd)
 {

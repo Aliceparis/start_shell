@@ -91,12 +91,12 @@ void free_envlist(t_env *env)
 void	free_all(t_shell *shell_program)
 {
 	clean_old_content(NULL, true);
-	if (shell_program->token_list)
+	/*if (shell_program->token_list)
 	{
 		free_token(&(shell_program->token_list));
 		shell_program->token_list = NULL;
 	}
-	/*if (shell_program->ast)
+	if (shell_program->ast)
 	{
 		free_ast(shell_program->ast);
 		shell_program->ast = NULL;
@@ -115,7 +115,6 @@ void	free_all(t_shell *shell_program)
 		close(shell_program->stdin);
 	if (shell_program->stdout)
 		close(shell_program->stdout);
-	rl_clear_history();
 	tcsetattr(STDIN_FILENO, TCSANOW, &shell_program->oldt);
 }
 void    exit_minishell(t_shell *shell_program)

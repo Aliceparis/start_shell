@@ -1,6 +1,6 @@
 #include "include/minishell.h"
 
-volatile sig_atomic_t g_heredoc_interrupted = 0;
+//volatile sig_atomic_t g_heredoc_interrupted = 0;
 // Gestion de SIGINT (Ctrl+C)
 /*static void sigint_handler(int sig)
 {
@@ -26,7 +26,7 @@ void heredoc_loop(const char *delimiter, int write_fd, t_shell *shell_program)
         line = readline("> ");
         if (!line)
         {
-            g_signal = 0;
+            g_signal = NORMAL;
             break;
         }
         if (ft_strcmp(line, delimiter) == 0)
@@ -38,7 +38,7 @@ void heredoc_loop(const char *delimiter, int write_fd, t_shell *shell_program)
         write(write_fd, "\n", 1);
         free(line);
     }
-    g_signal = 0;
+    g_signal = NORMAL;
     close(write_fd);
     exit(0);
 }

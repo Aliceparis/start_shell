@@ -1,4 +1,4 @@
-NAME=Minishell
+NAME=minishell
 LIBFT =libft/libft.a
 
 HEADER = ./include

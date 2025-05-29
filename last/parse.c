@@ -17,7 +17,8 @@ ASTnode *ft_parse(t_token **token, t_shell *shell_program)
         // 如果左侧无命令且当前是 `|`，报错（如 `| cmd` 或 `|`）
         if (*token && (*token)->type == IS_PIPE) 
 		{
-            error_message(shell_program, "Syntax error: Missing command before '|'\n", 1);
+            error_message(shell_program, "Syntax error: Missing command before", 2);
+            *token = NULL;
             return NULL;
         }
     }
@@ -29,9 +30,11 @@ ASTnode *ft_parse(t_token **token, t_shell *shell_program)
             // 检查是否缺少右侧命令（如 `cmd |` 或 `cmd1 | | cmd2`）
             if (!(*token)->next || (*token)->next->type == IS_PIPE) 
 			{
-                error_message(shell_program, "Syntax error: Missing command after '|'\n", 1);
-				//free_all(shell_program);
-				reset_terminal(shell_program);
+                error_message(shell_program, "Syntax error: Missing command after '|'\n", 2);
+				free_all(shell_program);
+                *token = NULL;
+				//reset_terminal(shell_program);
+                return NULL;
             }
 
             // 创建管道节点
@@ -41,7 +44,6 @@ ASTnode *ft_parse(t_token **token, t_shell *shell_program)
                 error_message(shell_program, "Error: Malloc Astnode failed.\n", 1);
                 free_all(shell_program);
             }
-
             *token = (*token)->next;  // 跳过 `|`
             node->left = left;
             node->type = PIPE;
@@ -68,8 +70,9 @@ ASTnode *ft_parse(t_token **token, t_shell *shell_program)
             // 检查是否缺少文件名（如 `echo >`）
             if (!(*token) || (*token)->type != IS_WORD) 
 			{
-                error_message(shell_program, "Syntax error: Missing filename after redirect\n", 1);
-				free_all(shell_program);
+                error_message(shell_program, "Syntax error: Missing filename after redirect\n", 2);
+				//free_all(shell_program);
+                *token = NULL;
                 return NULL;
             }
 

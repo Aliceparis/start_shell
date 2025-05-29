@@ -24,6 +24,7 @@
 # define NORMAL 0
 # define HEREDOC 1
 # define PIPE 2
+
 typedef struct e_node ASTnode;
 
 typedef struct s_env
@@ -37,7 +38,7 @@ typedef struct s_shell
 {
     char    *line;
     t_token *token_list;
-	t_token	*current_token;
+    t_token *current_token;
     t_env   *envlist;
     int stdin;
     int stdout;
@@ -45,12 +46,10 @@ typedef struct s_shell
     struct termios  oldt;
 	ASTnode	*ast;
     int exit_status;//退出值
-    bool heredoc_sigint;
-    bool signint_child;
+    bool    heredoc_sing;
 }t_shell;
 
 extern  volatile sig_atomic_t g_signal;
-
 
 /*******************main.c********************/
 void    init_shell(t_shell *shell_program, char **env);
@@ -130,6 +129,7 @@ void heredoc_loop(const char *delimiter, int write_fd, t_shell *shell_program);
 void print_ast(ASTnode *node, int depth);
 
 
+int is_valid_env_var_name(const char *name);
 
 char **env_list_to_array(t_env *env);
 # endif

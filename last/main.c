@@ -14,7 +14,7 @@ void    init_shell(t_shell *shell_program, char **env)
 	init_envlist(shell_program);
 	shell_program->stdin = dup(STDIN_FILENO);
     shell_program->stdout = dup(STDOUT_FILENO);
-    //shell_program->heredoc_sigint = false;
+    shell_program->heredoc_sing = false;
 
     tcgetattr(STDIN_FILENO, &shell_program->oldt);
     //tcsetattr(STDIN_FILENO, TCSANOW, &shell_program->oldt);
@@ -44,16 +44,20 @@ void    handle_signal(int sig)
     if (g_signal == HEREDOC)
     {
         write(STDERR_FILENO, "\n", 1);
+        shell_program.heredoc_sing = true;
         exit(1);
     }
     if (g_signal == PIPE)
     {
         write(STDERR_FILENO, "\n", 1);
+        shell_program.heredoc_sing = true;
+
         return; // 让父进程继续处理
     }
     if (g_signal == NORMAL)
     {
         write(STDOUT_FILENO, "\n", 1);  // 换行
+        shell_program.heredoc_sing = false;
         rl_on_new_line();  // 通知 readline 已换行
         rl_replace_line("", 0);  // 清空当前输入行
         rl_redisplay();
@@ -67,6 +71,7 @@ void    handle_signal(int sig)
 }*/
 void    reset_terminal(t_shell *shell_program)
 {
+    
     tcsetattr(STDIN_FILENO, TCSANOW, &shell_program->oldt);
 }
 int main(int ac, char **av, char **envp)
@@ -78,7 +83,6 @@ int main(int ac, char **av, char **envp)
     ft_init_signals(&shell_program);
     while (1)
     {
-        
         shell_program.line = readline("Minishell> ");
         if (!shell_program.line)
 			break ;
@@ -90,6 +94,7 @@ int main(int ac, char **av, char **envp)
             if (shell_program.ast)
             {
 			    ft_expand_ast(shell_program.ast, &shell_program);
+                //init_tree(&shell_program, shell_program.ast);
                 dispatch_command(&shell_program, shell_program.ast);
             }
 		}
@@ -97,6 +102,7 @@ int main(int ac, char **av, char **envp)
     }
     free_all(&shell_program);
 // 恢复终端设置
+    rl_clear_history();
     reset_terminal(&shell_program);
     return 0;
 }
