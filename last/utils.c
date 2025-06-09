@@ -2,7 +2,8 @@
 
 void error_message(t_shell *shell_program, const char *msg, int exit_s)
 {
-    printf("%s\n",msg);
+    write(2, msg,ft_strlen(msg));
+	write(1, "\n", 1);
     shell_program->exit_status = exit_s;
 }
 

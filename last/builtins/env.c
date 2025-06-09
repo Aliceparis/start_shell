@@ -5,48 +5,63 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jmen <jmen@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/19 14:29:17 by yujin             #+#    #+#             */
-/*   Updated: 2025/05/27 18:00:33 by jmen             ###   ########.fr       */
+/*   Created: 2025/06/07 19:31:05 by yujin             #+#    #+#             */
+/*   Updated: 2025/06/09 19:09:30 by jmen             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
-void ft_env(t_shell *shell_program, t_env *env)
+char	*get_key_env(char *str)
 {
-    (void)shell_program;
-    while (env)
-    {
-        printf("%s=%s\n", env->key, env->value);
-        env = env->next;
-    }
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == '=')
+			return (clean_old_content(ft_substr(str, 0, i), false));
+		i++;
+	}
+	return (ft_strdup(str));
 }
 
-t_env    *envlist_new(char *key, char *value)
+int	ft_env(t_shell *shell_program, t_env *env)
 {
-    t_env   *new;
+	(void)shell_program;
+	while (env)
+	{
+		printf("%s=%s\n", env->key, env->value);
+		env = env->next;
+	}
+	return (0);
+}
 
-    new = clean_old_content(malloc(sizeof(t_env)), false);
-    if (!new)
-        return (NULL);
-    new->key = clean_old_content(ft_strdup(key), false);
+t_env	*envlist_new(char *key, char *value)
+{
+	t_env	*new;
+
+	new = malloc(sizeof(t_env));
+	if (!new)
+		return (NULL);
+	new->key = clean_old_content(ft_strdup(key), false);
 	if (value)
-    	new->value = clean_old_content(ft_strdup(value), false);
-    new->next = NULL;
-    return (new);
+		new->value = clean_old_content(ft_strdup(value), false);
+	new->next = NULL;
+	return (new);
 }
 
-void   ft_envlist_addback(t_env **envlist, t_env *new)
+void	ft_envlist_addback(t_env **envlist, t_env *new)
 {
-    t_env   *current;
+	t_env	*current;
 
-    if (!*envlist)
-    {
-        *envlist = new;
-        return ;
-    }
-    current = *envlist;
-    while (current && current->next)
-        current = current->next;
-    current->next = new;
+	if (!*envlist)
+	{
+		*envlist = new;
+		return ;
+	}
+	current = *envlist;
+	while (current && current->next)
+		current = current->next;
+	current->next = new;
 }
